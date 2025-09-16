@@ -33,7 +33,7 @@ components:
   - electricity-liion_battery
   - electricity-pth
   - electricity-shortage
-  - electricity-transmission
+#  - electricity-transmission
 #  - h2-bpchp
 #  - h2-cavern
 #  - h2-demand
