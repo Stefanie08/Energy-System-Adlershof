@@ -33,32 +33,32 @@ ch4-shortage:
   defaults:
     output_parameters: "{}"
 
-h2-import:
-  carrier: h2
-  tech: import
-  type: shortage
-  foreign_keys:
-    bus: h2
-  defaults:
-    output_parameters: "{}"
+#h2-import:
+#  carrier: h2
+#  tech: import
+#  type: shortage
+#  foreign_keys:
+#    bus: h2
+#  defaults:
+#    output_parameters: "{}"
 
-h2-export:
-  carrier: h2
-  tech: export
-  type: excess
-  foreign_keys:
-    bus: h2
-  defaults:
-    input_parameters: "{}"
+#h2-export:
+#  carrier: h2
+#  tech: export
+#  type: excess
+#  foreign_keys:
+#    bus: h2
+#  defaults:
+#    input_parameters: "{}"
 
-h2-shortage:
-  carrier: h2
-  tech: shortage
-  type: shortage
-  foreign_keys:
-    bus: h2
-  defaults:
-    output_parameters: "{}"
+#h2-shortage:
+#  carrier: h2
+#  tech: shortage
+#  type: shortage
+#  foreign_keys:
+#    bus: h2
+#  defaults:
+#    output_parameters: "{}"
 
 #electricity-electrolyzer:
 #  carrier: electricity
