@@ -60,15 +60,15 @@ h2-shortage:
   defaults:
     output_parameters: "{}"
 
-electricity-electrolyzer:
-  carrier: electricity
-  tech: electrolyzer
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: h2
-  defaults:
-    output_parameters: "{}"
+#electricity-electrolyzer:
+#  carrier: electricity
+#  tech: electrolyzer
+#  type: conversion
+#  foreign_keys:
+#    from_bus: electricity
+#    to_bus: h2
+#  defaults:
+#    output_parameters: "{}"
 
 electricity-heatpump_large:
   carrier: electricity
@@ -212,14 +212,14 @@ ch4-bpchp:
     electricity_bus: electricity
     heat_bus: heat_central
 
-h2-bpchp:
-  carrier: h2
-  tech: bpchp
-  type: backpressure
-  foreign_keys:
-    fuel_bus: h2
-    electricity_bus: electricity
-    heat_bus: heat_central
+#h2-bpchp:
+#  carrier: h2
+#  tech: bpchp
+#  type: backpressure
+#  foreign_keys:
+#    fuel_bus: h2
+#    electricity_bus: electricity
+#    heat_bus: heat_central
 
 electricity-pth:
   carrier: electricity
@@ -231,33 +231,33 @@ electricity-pth:
   defaults:
     output_parameters: "{}"
 
-h2-demand:
-  carrier: h2
-  tech: demand
-  type: load
-  foreign_keys:
-    bus: h2
-    profile: h2-demand-profile
+#h2-demand:
+#  carrier: h2
+#  tech: demand
+#  type: load
+#  foreign_keys:
+#    bus: h2
+#    profile: h2-demand-profile
 
-h2-cavern:
-  carrier: h2
-  tech: cavern
-  type: storage
-  foreign_keys:
-    bus: h2
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
+#h2-cavern:
+#  carrier: h2
+#  tech: cavern
+#  type: storage
+#  foreign_keys:
+#    bus: h2
+#  defaults:
+#    input_parameters: "{}"
+#    output_parameters: "{}"
 
-h2-excess:
-  carrier: h2
-  tech: excess
-  type: excess
-  foreign_keys:
-    bus: h2
-  defaults:
-    marginal_cost: 0
-    input_parameters: "{}"
+#h2-excess:
+#  carrier: h2
+#  tech: excess
+#  type: excess
+#  foreign_keys:
+#    bus: h2
+#  defaults:
+#    marginal_cost: 0
+#    input_parameters: "{}"
 
 electricity-bev_charging:
   carrier: electricity
