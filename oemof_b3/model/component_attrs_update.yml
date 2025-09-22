@@ -146,6 +146,24 @@ heat_central-storage:
     input_parameters: "{}"
     output_parameters: "{}"
 
+heat_central-import:
+  carrier: heat_central
+  tech: import
+  type: shortage
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    output_parameters: "{}"
+
+heat_central-export:
+  carrier: heat_central
+  tech: export
+  type: excess
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    input_parameters: "{}"
+
 heat_decentral-demand:
   carrier: heat_decentral
   tech: demand
@@ -182,6 +200,24 @@ heat_decentral-storage:
   defaults:
     input_parameters: "{}"
     output_parameters: "{}"
+
+heat_decentral-import:
+  carrier: heat_decentral
+  tech: import
+  type: shortage
+  foreign_keys:
+    bus: heat_decentral
+  defaults:
+    output_parameters: "{}"
+
+heat_decentral-export:
+  carrier: heat_decentral
+  tech: export
+  type: excess
+  foreign_keys:
+    bus: heat_decentral
+  defaults:
+    input_parameters: "{}"
 
 ch4-boiler_large:
   carrier: ch4
