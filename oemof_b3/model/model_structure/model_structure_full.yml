@@ -45,7 +45,11 @@ components:
   - heat_central-demand
   - heat_central-excess
   - heat_central-shortage
-  - heat_central-storage
+  - heat_central-import
+  - heat_central-export
+  - heat_decentral-excess
+  - heat_decentral-import
+  - heat_decentral-export
   - heat_decentral-demand
   - heat_decentral-excess
   - heat_decentral-shortage
