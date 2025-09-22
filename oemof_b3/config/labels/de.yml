@@ -39,10 +39,14 @@ heat_central-demand: zen. Wärmebedarf
 heat_central-excess: zen. Wärmeüberschuss
 heat_central-shortage: zen. Wärme Shortage
 heat_central-storage: zen. Wärmespeicher
+heat_central-import: zen. Waermeimport
+heat_central-export: zen. Wärmeexport
 heat_decentral-demand: dez. Wärmebedarf
 heat_decentral-excess: dez. Wärmeüberschuss
 heat_decentral-shortage: dez. Wärme Shortage
 heat_decentral-storage: dez. Wärmespeicher
+heat_decentral-import: dez. Waermeimport
+heat_decentral-export: dez. Waermeexport
 hydro-reservoir: Reservoir
 hydro-ror: Laufwasserkraft
 lignite: Braunkohle
