@@ -41,6 +41,7 @@
 'from_to_bus': [
     'ch4-boiler_large',
     'ch4-boiler_small',
+    'ch4-gt',
 #    'electricity-electrolyzer',
 #    'h2-gt',
     'electricity-heatpump_large',
@@ -49,9 +50,9 @@
 #    'electricity-transmission',
 ]
 
-#'chp': [
-#    'h2-bpchp',
-#]
+'chp': [
+    'ch4-bpchp',
+]
 
 'efficiency': [
     'electricity-heatpump_small',
