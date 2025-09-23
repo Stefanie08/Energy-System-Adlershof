@@ -239,7 +239,7 @@ ch4-boiler_small:
   defaults:
     output_parameters: "{}"
 
-ch4-bpchp: # Maries Modell kein Strom flow
+ch4-bpchp:
   carrier: ch4
   tech: bpchp
   type: backpressure
