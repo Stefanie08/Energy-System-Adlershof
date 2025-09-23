@@ -239,7 +239,7 @@ ch4-boiler_small:
   defaults:
     output_parameters: "{}"
 
-ch4-bpchp:
+ch4-bpchp: # Maries Modell kein Strom flow
   carrier: ch4
   tech: bpchp
   type: backpressure
@@ -247,6 +247,16 @@ ch4-bpchp:
     fuel_bus: ch4
     electricity_bus: electricity
     heat_bus: heat_central
+
+ch4-gt:
+  carrier: ch4
+  tech: gt
+  type: conversion
+  foreign_keys:
+    from_bus: ch4
+    to_bus: heat_central
+  defaults:
+    output_parameters: "{}"
 
 #h2-bpchp:
 #  carrier: h2
