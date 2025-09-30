@@ -56,4 +56,6 @@ components:
   - heat_decentral-storage
   - hydro-ror
   - solar-pv
+  - roof-solar-pv
+  - facade-solar-pv
   - wind-onshore

@@ -28,6 +28,8 @@
     'heat_decentral-excess',
     'heat_decentral-shortage',
     'heat_decentral-storage',
+    'roof-solar-pv',
+    'facade-solar-pv',
 ]
 
 'profile': [
@@ -36,6 +38,8 @@
 #    'h2-demand',
     'heat_central-demand',
     'heat_decentral-demand',
+    'roof-solar-pv',
+    'facade-solar-pv'
 ]
 
 'from_to_bus': [
