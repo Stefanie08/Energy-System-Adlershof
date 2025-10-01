@@ -47,13 +47,15 @@ components:
   - heat_central-shortage
   - heat_central-import
   - heat_central-export
+  - heat_central-district_heating_storage
+  - heat_central-aquifer_storage
   - heat_decentral-excess
   - heat_decentral-import
   - heat_decentral-export
   - heat_decentral-demand
   - heat_decentral-excess
   - heat_decentral-shortage
-  - heat_decentral-storage
+  - heat_decentral-buffer_storage
   - hydro-ror
   - solar-pv
   - solar-pv_roof
