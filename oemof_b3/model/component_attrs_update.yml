@@ -315,7 +315,7 @@ electricity-bev_charging:
 
 solar-pv_roof:
   carrier: solar
-  tech: solar-pv_roof
+  tech: pv_roof
   type: volatile
   foreign_keys:
     bus: electricity
@@ -326,7 +326,7 @@ solar-pv_roof:
 
 solar-pv_facade:
   carrier: solar
-  tech: solar-pv_facade
+  tech: pv_facade
   type: volatile
   foreign_keys:
     bus: electricity
