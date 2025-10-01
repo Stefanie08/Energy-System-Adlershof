@@ -28,8 +28,8 @@
     'heat_decentral-excess',
     'heat_decentral-shortage',
     'heat_decentral-storage',
-    'roof-solar-pv',
-    'facade-solar-pv',
+    'solar-pv_roof',
+    'solar-pv_facade',
 ]
 
 'profile': [
