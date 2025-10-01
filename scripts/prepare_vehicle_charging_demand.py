@@ -138,7 +138,7 @@ def prepare_vehicle_charging_demand(input_dir, balanced=True, const_share=None):
         ts = ts_raw[ts_raw.index.year == year]
 
         # resample (15 min to hourly), unit is kW
-        hourly_ts = ts.resample("H").mean()
+        hourly_ts = ts.resample("h").mean()
 
         if balanced:
             # smooth work and home profiles as they have high peaks (strategy balanced)
