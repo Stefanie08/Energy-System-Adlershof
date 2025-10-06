@@ -50,7 +50,9 @@
     'ch4-gt',
 #    'electricity-electrolyzer',
 #    'h2-gt',
-    'electricity-heatpump_large',
+    'electricity-heatpump_river_large',
+    'electricity-heatpump_river_small',
+    'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
     'electricity-pth',
 #    'electricity-transmission',
@@ -61,5 +63,8 @@
 ]
 
 'efficiency': [
-    'electricity-heatpump_small',
+    'electricity-heatpump_river_large-profile',
+    'electricity-heatpump_river_small-profile',
+    'electricity-heatpump_geo_large-profile',
+    'electricity-heatpump_small-profile',
 ]
