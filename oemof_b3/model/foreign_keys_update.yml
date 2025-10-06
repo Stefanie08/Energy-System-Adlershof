@@ -19,7 +19,6 @@
     'heat_central-demand',
     'heat_central-excess',
     'heat_central-shortage',
-    'heat_central-storage',
     'heat_central-import',
     'heat_central-export',
     'heat_central-district_heating_storage',
