@@ -41,6 +41,7 @@
     'heat_decentral-demand',
     'roof-solar-pv',
     'facade-solar-pv'
+    'facade-solar-pv',
 ]
 
 'from_to_bus': [
