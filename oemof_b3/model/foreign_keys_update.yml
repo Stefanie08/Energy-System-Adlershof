@@ -33,7 +33,7 @@
     'heat_central-demand',
     'heat_decentral-demand',
     'roof-solar-pv',
-    'facade-solar-pv'
+    'facade-solar-pv',
     'facade-solar-pv',
 ]
 
