@@ -15,16 +15,16 @@
     'heat_central-shortage',
     'heat_central-import',
     'heat_central-export',
-    'heat_central-district_heating_storage',
-    'heat_central-aquifer_storage',
+    #'heat_central-district_heating_storage',
+    #'heat_central-aquifer_storage',
     'heat_decentral-demand',
     'heat_decentral-import',
     'heat_decentral-export',
     'heat_decentral-excess',
     'heat_decentral-shortage',
-    'heat_decentral-buffer_storage',
-    'solar-pv_roof',
-    'solar-pv_facade',
+    #'heat_decentral-buffer_storage',
+    #'solar-pv_roof',
+    #'solar-pv_facade',
 ]
 
 'profile': [
@@ -33,8 +33,7 @@
     'heat_central-demand',
     'heat_decentral-demand',
     'roof-solar-pv',
-    'facade-solar-pv',
-    'facade-solar-pv',
+    #'facade-solar-pv',
 ]
 
 'from_to_bus': [
