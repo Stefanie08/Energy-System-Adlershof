@@ -10,12 +10,6 @@
     'electricity-export',
     'electricity-import',
     'electricity-shortage',
-#    'h2-cavern',
-#    'h2-demand',
-#    'h2-excess',
-#    'h2-export',
-#    'h2-import',
-#    'h2-shortage',
     'heat_central-demand',
     'heat_central-excess',
     'heat_central-shortage',
@@ -36,7 +30,6 @@
 'profile': [
     'ch4-demand',
     'electricity-bev_charging',
-#    'h2-demand',
     'heat_central-demand',
     'heat_decentral-demand',
     'roof-solar-pv',
@@ -48,14 +41,11 @@
     'ch4-boiler_large',
     'ch4-boiler_small',
     'ch4-gt',
-#    'electricity-electrolyzer',
-#    'h2-gt',
     'electricity-heatpump_river_large',
     'electricity-heatpump_river_small',
     'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
     'electricity-pth',
-#    'electricity-transmission',
 ]
 
 'chp': [
