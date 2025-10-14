@@ -45,38 +45,38 @@ electricity-heatpump_small:
     output_parameters: "{}"
 
 
-electricity-heatpump_river_large:
-  carrier: electricity
-  tech: heatpump_river_large
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: heat_central
-    efficiency: electricity-heatpump_river_large-profile
-  defaults:
-    output_parameters: "{}"
+#electricity-heatpump_river_large:
+#  carrier: electricity
+#  tech: heatpump_river_large
+#  type: conversion
+#  foreign_keys:
+#    from_bus: electricity
+#    to_bus: heat_central
+#    efficiency: electricity-heatpump_river_large-profile
+#  defaults:
+#    output_parameters: "{}"
 
-electricity-heatpump_river_small:
-  carrier: electricity
-  tech: heatpump_river_small
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: heat_decentral
-    efficiency: electricity-heatpump_river_small-profile
-  defaults:
-    output_parameters: "{}"
+#electricity-heatpump_river_small:
+#  carrier: electricity
+#  tech: heatpump_river_small
+#  type: conversion
+#  foreign_keys:
+#    from_bus: electricity
+#    to_bus: heat_decentral
+#    efficiency: electricity-heatpump_river_small-profile
+#  defaults:
+#    output_parameters: "{}"
 
-electricity-heatpump_geo_large:
-  carrier: electricity
-  tech: heatpump_geo_large
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: heat_central
-    efficiency: electricity-heatpump_geo_large-profile
-  defaults:
-    output_parameters: "{}"
+#electricity-heatpump_geo_large:
+#  carrier: electricity
+#  tech: heatpump_geo_large
+#  type: conversion
+#  foreign_keys:
+#    from_bus: electricity
+#    to_bus: heat_central
+#    efficiency: electricity-heatpump_geo_large-profile
+#  defaults:
+#    output_parameters: "{}"
 
 electricity-export:
   carrier: electricity
@@ -123,16 +123,6 @@ heat_central-shortage:
   defaults:
     output_parameters: "{}"
 
-heat_central-storage:
-  carrier: heat_central
-  tech: storage
-  type: storage
-  foreign_keys:
-    bus: heat_central
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
-
 heat_central-import:
   carrier: heat_central
   tech: import
@@ -151,25 +141,25 @@ heat_central-export:
   defaults:
     input_parameters: "{}"
 
-heat_central-district_heating_storage:
-  carrier: heat_central
-  tech: district_heating_storage
-  type: storage
-  foreign_keys:
-    bus: heat_central
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
+#heat_central-district_heating_storage:
+#  carrier: heat_central
+#  tech: district_heating_storage
+#  type: storage
+#  foreign_keys:
+#    bus: heat_central
+#  defaults:
+#    input_parameters: "{}"
+#    output_parameters: "{}"
 
-heat_central-aquifer_storage:
-  carrier: heat_central
-  tech: aquifer_storage
-  type: storage
-  foreign_keys:
-    bus: heat_central
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
+#heat_central-aquifer_storage:
+#  carrier: heat_central
+#  tech: aquifer_storage
+#  type: storage
+#  foreign_keys:
+#    bus: heat_central
+#  defaults:
+#    input_parameters: "{}"
+#    output_parameters: "{}"
 
 heat_decentral-demand:
   carrier: heat_decentral
@@ -198,15 +188,15 @@ heat_decentral-shortage:
   defaults:
     output_parameters: "{}"
 
-heat_decentral-buffer_storage:
-  carrier: heat_decentral
-  tech: buffer_storage
-  type: storage
-  foreign_keys:
-    bus: heat_decentral
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
+#heat_decentral-buffer_storage:
+#  carrier: heat_decentral
+#  tech: buffer_storage
+#  type: storage
+#  foreign_keys:
+#    bus: heat_decentral
+#  defaults:
+#    input_parameters: "{}"
+#    output_parameters: "{}"
 
 heat_decentral-import:
   carrier: heat_decentral
@@ -283,16 +273,16 @@ electricity-bev_charging:
     bus: electricity
     profile: electricity-bev_charging-profile
 
-solar-pv_roof:
-  carrier: solar
-  tech: pv_roof
-  type: volatile
-  foreign_keys:
-    bus: electricity
-    profile: solar-pv_roof-profile
-  defaults:
-    marginal_cost: 0
-    output_parameters: "{}"
+#solar-pv_roof:
+#  carrier: solar
+#  tech: pv_roof
+#  type: volatile
+#  foreign_keys:
+#    bus: electricity
+#    profile: solar-pv_roof-profile
+#  defaults:
+#    marginal_cost: 0
+#    output_parameters: "{}"
 
 solar-pv_facade:
   carrier: solar
