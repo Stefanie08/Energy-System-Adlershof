@@ -63,8 +63,8 @@
 ]
 
 'efficiency': [
-    'electricity-heatpump_river_large-profile',
-    'electricity-heatpump_river_small-profile',
-    'electricity-heatpump_geo_large-profile',
-    'electricity-heatpump_small-profile',
+    'electricity-heatpump_river_large',
+    'electricity-heatpump_river_small',
+    'electricity-heatpump_geo_large',
+    'electricity-heatpump_small',
 ]
