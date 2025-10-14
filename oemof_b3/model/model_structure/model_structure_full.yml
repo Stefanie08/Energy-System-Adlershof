@@ -1,14 +1,12 @@
 regions:
-#  - BB
   - B
 
 links:
-#  - BB-B
+
 
 busses:
   - ch4
   - electricity
-#  - h2
   - heat_central
   - heat_decentral
 
@@ -25,7 +23,6 @@ components:
   - electricity-bev_charging
   - electricity-curtailment
   - electricity-demand
-#  - electricity-electrolyzer
   - electricity-export
   - electricity-heatpump_river_large #Fluss zen.
   - electricity-heatpump_geo_large #oberflächennah zen.
@@ -35,15 +32,6 @@ components:
   - electricity-liion_battery #großbatterie
   - electricity-pth
   - electricity-shortage
-#  - electricity-transmission
-#  - h2-bpchp
-#  - h2-cavern
-#  - h2-demand
-#  - h2-excess
-#  - h2-export
-#  - h2-gt
-#  - h2-import
-#  - h2-shortage
   - heat_central-demand
   - heat_central-excess
   - heat_central-shortage
