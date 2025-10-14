@@ -72,7 +72,7 @@ ch4-shortage:
 
 electricity-heatpump_small:
   carrier: electricity
-  tech: electricity-heatpump_small
+  tech: heatpump_small
   type: conversion
   foreign_keys:
     from_bus: electricity
