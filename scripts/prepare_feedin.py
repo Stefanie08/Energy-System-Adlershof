@@ -65,7 +65,7 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
         :,
         [
             config.settings.prepare_feedin.nuts_de30,
-            config.settings.prepare_feedin.nuts_de40,
+            #config.settings.prepare_feedin.nuts_de40, # Brandenburg wird rausgenommen
         ],
     ].rename(columns=config.settings.prepare_feedin.rename_nuts)
 
@@ -188,8 +188,13 @@ if __name__ == "__main__":
             filename_ts=filename_pv, year=year, type="solar-pv"
         )
 
+        # TODO: prepare pv_facde time series with correct incidence angle
+        pv_facade_ts = prepare_wind_and_pv_time_series(
+            filename_ts=filename_pv, year=year, type="solar-pv_facade"
+        )
+
         # add time series to `time_series_df`
-        time_series_df = pd.concat([time_series_df, wind_ts, pv_ts], axis=0)
+        time_series_df = pd.concat([time_series_df, wind_ts, pv_ts, pv_facade_ts], axis=0)
 
     # prepare ror time series
     for region in config.settings.prepare_feedin.regions:
