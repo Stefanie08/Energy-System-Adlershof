@@ -272,16 +272,16 @@ electricity-bev_charging:
     bus: electricity
     profile: electricity-bev_charging-profile
 
-#solar-pv_roof:
-#  carrier: solar
-#  tech: pv_roof
-#  type: volatile
-#  foreign_keys:
-#    bus: electricity
-#    profile: solar-pv_roof-profile
-#  defaults:
-#    marginal_cost: 0
-#    output_parameters: "{}"
+solar-pv_roof:
+  carrier: solar
+  tech: pv_roof
+  type: volatile
+  foreign_keys:
+    bus: electricity
+    profile: solar-pv_roof-profile
+  defaults:
+    marginal_cost: 0
+    output_parameters: "{}"
 
 solar-pv_facade:
   carrier: solar
