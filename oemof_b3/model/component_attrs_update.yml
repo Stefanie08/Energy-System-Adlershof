@@ -40,10 +40,9 @@ electricity-heatpump_small:
   foreign_keys:
     from_bus: electricity
     to_bus: heat_decentral
-    efficiency: efficiency-profile
+    efficiency: electricity-heatpump_small-profile
   defaults:
     output_parameters: "{}"
-
 
 #electricity-heatpump_river_large:
 #  carrier: electricity
