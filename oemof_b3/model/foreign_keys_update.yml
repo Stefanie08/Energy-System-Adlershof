@@ -24,7 +24,7 @@
     'heat_decentral-shortage',
     #'heat_decentral-buffer_storage',
     #'solar-pv_roof',
-    #'solar-pv_facade',
+    'solar-pv_facade',
 ]
 
 'profile': [
@@ -32,8 +32,8 @@
     'electricity-bev_charging',
     'heat_central-demand',
     'heat_decentral-demand',
-    'roof-solar-pv',
-    #'facade-solar-pv',
+    #'solar-pv_roof',
+    'solar-pv_facade',
 ]
 
 'from_to_bus': [
