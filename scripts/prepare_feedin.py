@@ -188,13 +188,18 @@ if __name__ == "__main__":
             filename_ts=filename_pv, year=year, type="solar-pv"
         )
 
-        # TODO: prepare pv_facde time series with correct incidence angle
+        # TODO: prepare pv_facde time series with correct inclination angle
         pv_facade_ts = prepare_wind_and_pv_time_series(
             filename_ts=filename_pv, year=year, type="solar-pv_facade"
         )
 
+        # TODO: prepare pv_facde time series with correct inclination angle
+        pv_roof_ts = prepare_wind_and_pv_time_series(
+            filename_ts=filename_pv, year=year, type="solar-pv_roof"
+        )
+
         # add time series to `time_series_df`
-        time_series_df = pd.concat([time_series_df, wind_ts, pv_ts, pv_facade_ts], axis=0)
+        time_series_df = pd.concat([time_series_df, wind_ts, pv_ts, pv_facade_ts, pv_roof_ts], axis=0)
 
     # prepare ror time series
     for region in config.settings.prepare_feedin.regions:
