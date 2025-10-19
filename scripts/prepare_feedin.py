@@ -188,12 +188,12 @@ if __name__ == "__main__":
             filename_ts=filename_pv, year=year, type="solar-pv"
         )
 
-        # TODO: prepare pv_facde time series with correct inclination angle
+        # TODO: prepare pv_facade time series with correct inclination angle
         pv_facade_ts = prepare_wind_and_pv_time_series(
             filename_ts=filename_pv, year=year, type="solar-pv_facade"
         )
 
-        # TODO: prepare pv_facde time series with correct inclination angle
+        # TODO: prepare pv_roof time series with correct inclination angle
         pv_roof_ts = prepare_wind_and_pv_time_series(
             filename_ts=filename_pv, year=year, type="solar-pv_roof"
         )
