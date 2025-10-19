@@ -115,14 +115,14 @@ def prepare_ror_time_series(filename_ts, region):
     # load raw time series and copy data frame
     ts_raw = pd.read_csv(filename_ts, index_col=0, skiprows=3, delimiter=";")
     # add time index
-    ts_raw.index = pd.date_range("2017-01-01 00:00:00", "2017-12-31 23:00:00", freq="H")
+    ts_raw.index = pd.date_range("2017-01-01 00:00:00", "2017-12-31 23:00:00", freq="h")
 
     # prepare for all years
     ts_df = pd.DataFrame()
     for year in config.settings.prepare_feedin.years:
         time_series = ts_raw.copy()
         new_index = pd.date_range(
-            f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00", freq="H"
+            f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00", freq="h"
         )
         new_index_df = pd.DataFrame(index=new_index)
         leap_year = new_index_df.index.is_leap_year[0]
