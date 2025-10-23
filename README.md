@@ -1,4 +1,7 @@
-# oemof-B3
+# Energiesystem Adlershof mit oemof-B3
+
+**This repo can soon be used to model the energy system of Adlershof in Berlin. Both the model and
+the documentation are under construction but will be updated frequently.** 
 
 oemof-B3 is an energy system model of Berlin and Brandenburg. It represents many sectors:
 Electricity, central and decentral heat, hydrogen, CO2 and methane. It is a multi-node-model, which
