@@ -65,7 +65,6 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
         :,
         [
             config.settings.prepare_feedin.nuts_de30,
-            #config.settings.prepare_feedin.nuts_de40, # Brandenburg wird rausgenommen
         ],
     ].rename(columns=config.settings.prepare_feedin.rename_nuts)
 
@@ -199,7 +198,9 @@ if __name__ == "__main__":
         )
 
         # add time series to `time_series_df`
-        time_series_df = pd.concat([time_series_df, wind_ts, pv_ts, pv_facade_ts, pv_roof_ts], axis=0)
+        time_series_df = pd.concat(
+            [time_series_df, wind_ts, pv_ts, pv_facade_ts, pv_roof_ts], axis=0
+        )
 
     # prepare ror time series
     for region in config.settings.prepare_feedin.regions:
