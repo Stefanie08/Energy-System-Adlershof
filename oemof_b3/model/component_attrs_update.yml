@@ -44,38 +44,38 @@ electricity-heatpump_small:
   defaults:
     output_parameters: "{}"
 
-#electricity-heatpump_river_large:
-#  carrier: electricity
-#  tech: heatpump_river_large
-#  type: conversion
-#  foreign_keys:
-#    from_bus: electricity
-#    to_bus: heat_central
-#    efficiency: electricity-heatpump_river_large-profile
-#  defaults:
-#    output_parameters: "{}"
+electricity-heatpump_river_large:
+  carrier: electricity
+  tech: heatpump_river_large
+  type: conversion
+  foreign_keys:
+    from_bus: electricity
+    to_bus: heat_central
+    efficiency: electricity-heatpump_river_large-profile
+  defaults:
+    output_parameters: "{}"
 
-#electricity-heatpump_river_small:
-#  carrier: electricity
-#  tech: heatpump_river_small
-#  type: conversion
-#  foreign_keys:
-#    from_bus: electricity
-#    to_bus: heat_decentral
-#    efficiency: electricity-heatpump_river_small-profile
-#  defaults:
-#    output_parameters: "{}"
+electricity-heatpump_river_small:
+  carrier: electricity
+  tech: heatpump_river_small
+  type: conversion
+  foreign_keys:
+    from_bus: electricity
+    to_bus: heat_decentral
+    efficiency: electricity-heatpump_river_small-profile
+  defaults:
+    output_parameters: "{}"
 
-#electricity-heatpump_geo_large:
-#  carrier: electricity
-#  tech: heatpump_geo_large
-#  type: conversion
-#  foreign_keys:
-#    from_bus: electricity
-#    to_bus: heat_central
-#    efficiency: electricity-heatpump_geo_large-profile
-#  defaults:
-#    output_parameters: "{}"
+electricity-heatpump_geo_large:
+  carrier: electricity
+  tech: heatpump_geo_large
+  type: conversion
+  foreign_keys:
+    from_bus: electricity
+    to_bus: heat_central
+    efficiency: electricity-heatpump_geo_large-profile
+  defaults:
+    output_parameters: "{}"
 
 electricity-export:
   carrier: electricity
