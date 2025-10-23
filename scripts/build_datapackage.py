@@ -51,6 +51,9 @@ from oemof_b3.tools.data_processing import (
     prepare_attr_name,
     save_df,
 )
+from oemof_b3.tools.update_foreign_keys_hp import (
+    update_foreign_keys_hp,
+)
 from oemof_b3.config import config
 
 
@@ -322,3 +325,10 @@ if __name__ == "__main__":
 
     # add metadata
     edp.infer_metadata(foreign_keys_update=foreign_keys_update)
+
+    update_foreign_keys_hp()
+
+    logger.info(
+        f"Saved updated foreign key references for heat pump "
+        f"efficiency profiles to '{destination}'."
+    )
