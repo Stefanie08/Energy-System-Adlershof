@@ -1,4 +1,4 @@
-# Energiesystem Adlershof based on oemof-B3
+# Energy System Adlershof based on oemof-B3
 
 **This repo can soon be used to model the energy system of Adlershof in Berlin. Both the model and
 the documentation are under construction but will be updated frequently.** 
