@@ -140,25 +140,25 @@ heat_central-export:
   defaults:
     input_parameters: "{}"
 
-#heat_central-district_heating_storage:
-#  carrier: heat_central
-#  tech: district_heating_storage
-#  type: storage
-#  foreign_keys:
-#    bus: heat_central
-#  defaults:
-#    input_parameters: "{}"
-#    output_parameters: "{}"
+heat_central-district_heating_storage:
+  carrier: heat_central
+  tech: district_heating_storage
+  type: storage
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    input_parameters: "{}"
+    output_parameters: "{}"
 
-#heat_central-aquifer_storage:
-#  carrier: heat_central
-#  tech: aquifer_storage
-#  type: storage
-#  foreign_keys:
-#    bus: heat_central
-#  defaults:
-#    input_parameters: "{}"
-#    output_parameters: "{}"
+heat_central-aquifer_storage:
+  carrier: heat_central
+  tech: aquifer_storage
+  type: storage
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    input_parameters: "{}"
+    output_parameters: "{}"
 
 heat_decentral-demand:
   carrier: heat_decentral
@@ -187,15 +187,15 @@ heat_decentral-shortage:
   defaults:
     output_parameters: "{}"
 
-#heat_decentral-buffer_storage:
-#  carrier: heat_decentral
-#  tech: buffer_storage
-#  type: storage
-#  foreign_keys:
-#    bus: heat_decentral
-#  defaults:
-#    input_parameters: "{}"
-#    output_parameters: "{}"
+heat_decentral-buffer_storage:
+  carrier: heat_decentral
+  tech: buffer_storage
+  type: storage
+  foreign_keys:
+    bus: heat_decentral
+  defaults:
+    input_parameters: "{}"
+    output_parameters: "{}"
 
 heat_decentral-import:
   carrier: heat_decentral
