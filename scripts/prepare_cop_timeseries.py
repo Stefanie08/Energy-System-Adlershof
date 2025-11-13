@@ -228,7 +228,7 @@ if __name__ == "__main__":
                 index=pd.date_range(
                     datetime.datetime(year, 1, 1, 0),
                     periods=len(temperature),
-                    freq="H",
+                    freq="h",
                 )
             )
 
