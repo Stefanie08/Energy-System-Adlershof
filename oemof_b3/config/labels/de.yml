@@ -17,12 +17,12 @@ ch4-shortage: CH4 Shortage
 electricity-bev_charging: BEV
 electricity-curtailment: Abregelung
 electricity-demand: Strombedarf
-electricity-electrolyzer: Elektrolyse
 electricity-export: Stromexport
-electricity-heatpump_large: Wärmepumpe (groß)
-electricity-heatpump_small: Wärmepumpe (Haushalt)
+electricity-heatpump_river_large: Flusswasserwärmepumpe
+electricity-heatpump_river_small: Flusswasserwärmepumpe (dezentral)
+electricity-heatpump_small: Wärmepumpe (Haushalte)
 electricity-import: Stromimport
-electricity-liion_battery: Batterie
+electricity-liion_battery: Großbatterie
 electricity-pth: res. PtH
 electricity-shortage: Strom
 electricity-transmission: Stromübertragung
@@ -39,19 +39,19 @@ heat_central-demand: zen. Wärmebedarf
 heat_central-excess: zen. Wärmeüberschuss
 heat_central-shortage: zen. Wärme Shortage
 heat_central-storage: zen. Wärmespeicher
+heat_central-district_heating_storage: Druckwärmespeicher
+heat_central-aquifer_storage: Aquiferwärmespeicher
 heat_central-import: zen. Waermeimport
 heat_central-export: zen. Wärmeexport
 heat_decentral-demand: dez. Wärmebedarf
 heat_decentral-excess: dez. Wärmeüberschuss
 heat_decentral-shortage: dez. Wärme Shortage
-heat_decentral-storage: dez. Wärmespeicher
+heat_decentral-buffer_storage: dez. Pufferwärmespeicher
 heat_decentral-import: dez. Waermeimport
 heat_decentral-export: dez. Waermeexport
-hydro-reservoir: Reservoir
-hydro-ror: Laufwasserkraft
 lignite: Braunkohle
 nuclear-st: Kernkraftwerk
 other: Andere
 solar-pv: PV
-wind-offshore: Wind Offshore
-wind-onshore: Wind Onshore
+solar-pv_roof: Dach-PV
+solar-pv_facade: Fassaden-PV
