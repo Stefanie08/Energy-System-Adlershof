@@ -5,12 +5,12 @@ biomass: Biomasse
 biomass-gt: Biomasse GT
 biomass-st: Biomasse DT
 ch4: CH4
-ch4-boiler: CH4 Boiler
+ch4-boiler_large: CH4 Boiler (Groß)
+ch4-boiler_small: CH4 Boiler (Klein)
 ch4-bpchp: CH4 KWK (Gegendruck)
 ch4-demand: CH4 Bedarf
 ch4-excess: CH4 Überschuss
 ch4-export: CH4 Export
-ch4-extchp: CH4 KWK (Entnahmekond.)
 ch4-gt: CH4 GT
 ch4-import: CH4 Import
 ch4-shortage: CH4 Shortage
@@ -19,6 +19,7 @@ electricity-curtailment: Abregelung
 electricity-demand: Strombedarf
 electricity-export: Stromexport
 electricity-heatpump_river_large: Flusswasserwärmepumpe
+electricity-heatpump_geo_large: oberflächennahe Geothermie
 electricity-heatpump_river_small: Flusswasserwärmepumpe (dezentral)
 electricity-heatpump_small: Wärmepumpe (Haushalte)
 electricity-import: Stromimport
@@ -26,29 +27,20 @@ electricity-liion_battery: Großbatterie
 electricity-pth: res. PtH
 electricity-shortage: Strom
 electricity-transmission: Stromübertragung
-h2-bpchp: H2 KWK (Gegendruck)
-h2-cavern: H2 Kaverne
-h2-demand: H2 Bedarf
-h2-excess: H2 Überschuss
-h2-export: H2 Export
-h2-gt: H2 GT
 hard coal: Steinkohle
-h2-import: H2 Import
-h2-shortage: H2 Import
 heat_central-demand: zen. Wärmebedarf
 heat_central-excess: zen. Wärmeüberschuss
 heat_central-shortage: zen. Wärme Shortage
-heat_central-storage: zen. Wärmespeicher
-heat_central-district_heating_storage: Druckwärmespeicher
-heat_central-aquifer_storage: Aquiferwärmespeicher
 heat_central-import: zen. Waermeimport
 heat_central-export: zen. Wärmeexport
+heat_central-district_heating_storage: Druckwärmespeicher
+heat_central-aquifer_storage: Aquiferwärmespeicher
 heat_decentral-demand: dez. Wärmebedarf
 heat_decentral-excess: dez. Wärmeüberschuss
 heat_decentral-shortage: dez. Wärme Shortage
-heat_decentral-buffer_storage: dez. Pufferwärmespeicher
 heat_decentral-import: dez. Waermeimport
 heat_decentral-export: dez. Waermeexport
+heat_decentral-buffer_storage: dez. Pufferwärmespeicher
 lignite: Braunkohle
 nuclear-st: Kernkraftwerk
 other: Andere
