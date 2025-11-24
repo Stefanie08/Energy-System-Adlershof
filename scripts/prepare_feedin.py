@@ -60,7 +60,7 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
 
     # extract one specific `year`
     time_series = time_series[time_series.index.year == year]
-    # get time series for B and BB only
+    # get time series for B
     time_series_regions = time_series.loc[
         :,
         [
@@ -90,85 +90,10 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
     return ts_prepared
 
 
-def prepare_ror_time_series(filename_ts, region):
-    r"""
-    Prepares and formats run-of-the-river (ror) time series for region 'B' and 'BB'.
-
-    The raw data only includes one year. This functions prepares the time series for years `YEARS`
-    using the same data for each year. For leap years Feb 29th is filled with the last value of Feb
-    28.
-
-    Parameters
-    ----------
-    filename_ts : str
-        Path including file name to ror time series of DIW Data Documentation 92
-    region : str
-        Region of time series; used for column 'region' in output
-
-    Returns
-    -------
-    ts_df : pd.DataFrame
-        Contains time series in the format of time series template of oemof-B3
-
-    """
-    # load raw time series and copy data frame
-    ts_raw = pd.read_csv(filename_ts, index_col=0, skiprows=3, delimiter=";")
-    # add time index
-    ts_raw.index = pd.date_range("2017-01-01 00:00:00", "2017-12-31 23:00:00", freq="h")
-
-    # prepare for all years
-    ts_df = pd.DataFrame()
-    for year in config.settings.prepare_feedin.years:
-        time_series = ts_raw.copy()
-        new_index = pd.date_range(
-            f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00", freq="h"
-        )
-        new_index_df = pd.DataFrame(index=new_index)
-        leap_year = new_index_df.index.is_leap_year[0]
-
-        # extend time series for leap years
-        if leap_year == True:  # noqa: E712
-            # Change datetimeindex to current `year`
-            time_series.index = (
-                time_series.reset_index()["index"]
-                .apply(lambda x: x.replace(year=year))
-                .values
-            )
-            # concatenate `time_series` and the new index and fill nans with value of previous day
-            time_series = pd.concat(
-                [time_series, new_index_df], axis=1, join="outer"
-            ).fillna(method="ffill")
-        else:
-            # set `new_index`
-            time_series.index = new_index
-
-        # bring time series to oemof-B3 format with `stack_timeseries()` and `format_header()`
-        ts_stacked = dp.stack_timeseries(time_series).rename(
-            columns={"var_name": "region"}
-        )
-        ts_prepared = dp.format_header(
-            df=ts_stacked,
-            header=dp.HEADER_B3_TS,
-            index_name=config.settings.general.ts_index_name,
-        )
-        ts_prepared.loc[:, "scenario_key"] = "ALL"
-        ts_df = pd.concat([ts_df, ts_prepared])
-
-    # add additional information as required by template
-    ts_df.loc[:, "region"] = region
-    ts_df.loc[:, "var_unit"] = config.settings.prepare_feedin.ts_var_unit
-    ts_df.loc[:, "var_name"] = "hydro-ror-profile"
-    ts_df.loc[:, "source"] = config.settings.prepare_feedin.ts_source_ror
-    ts_df.loc[:, "comment"] = config.settings.prepare_feedin.ts_comment_ror
-
-    return ts_df
-
-
 if __name__ == "__main__":
     filename_wind = sys.argv[1]
     filename_pv = sys.argv[2]
-    filename_ror = sys.argv[3]
-    output_file = sys.argv[4]
+    output_file = sys.argv[3]
 
     # initialize data frame
     time_series_df = pd.DataFrame()
@@ -176,11 +101,11 @@ if __name__ == "__main__":
     # prepare time series for each year
     for year in config.settings.prepare_feedin.years:
         # prepare wind time series
-        wind_ts = prepare_wind_and_pv_time_series(
-            filename_ts=filename_wind,
-            year=year,
-            type="wind-onshore",
-        )
+        #wind_ts = prepare_wind_and_pv_time_series(
+        #    filename_ts=filename_wind,
+        #    year=year,
+        #    type="wind-onshore",
+        #)
 
         # prepare pv time series
         pv_ts = prepare_wind_and_pv_time_series(
@@ -188,9 +113,9 @@ if __name__ == "__main__":
         )
 
         # TODO: prepare pv_facade time series with correct inclination angle
-        pv_facade_ts = prepare_wind_and_pv_time_series(
-            filename_ts=filename_pv, year=year, type="solar-pv_facade"
-        )
+        #pv_facade_ts = prepare_wind_and_pv_time_series(
+        #    filename_ts=filename_pv, year=year, type="solar-pv_facade"
+        #)
 
         # TODO: prepare pv_roof time series with correct inclination angle
         pv_roof_ts = prepare_wind_and_pv_time_series(
@@ -199,15 +124,8 @@ if __name__ == "__main__":
 
         # add time series to `time_series_df`
         time_series_df = pd.concat(
-            [time_series_df, wind_ts, pv_ts, pv_facade_ts, pv_roof_ts], axis=0
+            [time_series_df, pv_ts, pv_roof_ts], axis=0
         )
-
-    # prepare ror time series
-    for region in config.settings.prepare_feedin.regions:
-        ror_ts = prepare_ror_time_series(filename_ts=filename_ror, region=region)
-
-        # add time series to `time_series_df`
-        time_series_df = pd.concat([time_series_df, ror_ts], axis=0)
 
     # set index
     time_series_df.reset_index(drop=True, inplace=True)
