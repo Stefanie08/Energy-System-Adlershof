@@ -24,9 +24,9 @@ components:
   - electricity-curtailment
   - electricity-demand
   - electricity-export
-  - electricity-heatpump_river_large #Fluss zen.
-  - electricity-heatpump_geo_large #oberflächennah zen.
-  - electricity-heatpump_river_small #Fluss dez.
+#  - electricity-heatpump_river_large #Fluss zen.
+#  - electricity-heatpump_geo_large #oberflächennah zen.
+#  - electricity-heatpump_river_small #Fluss dez.
   - electricity-heatpump_small # Außenluft
   - electricity-import
   - electricity-liion_battery #großbatterie
@@ -45,8 +45,6 @@ components:
   - heat_decentral-import
   - heat_decentral-export
   - heat_decentral-buffer_storage
-  - hydro-ror
   - solar-pv
   - solar-pv_roof
-  - solar-pv_facade
-  - wind-onshore
+  #- solar-pv_facade
