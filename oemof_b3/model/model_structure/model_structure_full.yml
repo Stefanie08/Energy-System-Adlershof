@@ -5,21 +5,21 @@ links:
 
 
 busses:
-  - ch4
+  - h2
   - electricity
   - heat_central
   - heat_decentral
 
 components:
-  - ch4-boiler_large
-  - ch4-boiler_small
-  - ch4-bpchp
-  - ch4-demand
-  - ch4-excess
-  - ch4-export
-  - ch4-gt
-  - ch4-import
-  - ch4-shortage
+  - h2-boiler_large
+  - h2-boiler_small
+  - h2-bpchp
+  - h2-demand
+  - h2-excess
+  - h2-export
+  - h2-gt
+  - h2-import
+  - h2-shortage
   - electricity-bev_charging
   - electricity-curtailment
   - electricity-demand
