@@ -40,7 +40,7 @@ prepare_cop_timeseries:
 
 prepare_electricity_demand:
   opsd_years: [2015, 2016, 2017, 2018, 2019]
-  regions: [BB, B]
+  regions: [B]
   ts_var_unit: None
   ts_source: https://data.open-power-system-data.org/time_series/2020-10-06
   ts_comment: DE_50hertz actual load data
@@ -51,15 +51,10 @@ prepare_feedin:
   years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019]
   # specific to wind and pv time series
   nuts_de30: DE30
-  nuts_de40: DE40
-  rename_nuts: {DE30: B, DE40: BB}
+  rename_nuts: {DE30: B}
   ts_var_unit: None
   ts_source: https://www.renewables.ninja/
   ts_comment: navigate to country Germany
-  # specific to ror time series
-  regions: [BB, B]
-  ts_source_ror: https://zenodo.org/record/1044463
-  ts_comment_ror: Isolated ror availability time series from DIW data
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None
