@@ -1,6 +1,6 @@
 h2:
   balanced:
-    False
+    True
 
 heat_central:
   balanced:
@@ -12,4 +12,4 @@ heat_decentral:
 
 ch4:
   balanced:
-    True
+    False
