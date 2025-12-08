@@ -64,7 +64,7 @@ prepare_vehicle_charging_demand:
   home_end: "05:00"  # end charging strategy "balanced" for home profile
   work_start: "06:00"  # start charging strategy "balanced" for work profile
   work_end: "14:00"  # end charging strategy "balanced" for work profile
-  region_dict: {Berlin: B, Brandenburg: BB }
+  region_dict: {Berlin: B}
   var_name: electricity-bev_charging-profile
 
 process_re_potential:
