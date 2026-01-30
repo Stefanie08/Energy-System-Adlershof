@@ -277,93 +277,69 @@ def get_heat_demand(scalars, scenario, carrier, region):
     return demands, demand_unit
 
 
-def calculate_heat_load(carrier, holidays, temperature, yearly_demands, building_class):
+def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
     """
-    This function calculates a heat load profile of Industry, trade,
-    service (ghd: Gewerbe, Handel, Dienstleistung) and Household (hh: Haushalt)
-    sectors
+    This function calculates a heat load profile of a consumer
+    (eg.: ghd, sfh, mfh) using heat_load data and building distribution shares.
 
     Parameters
     ----------
+    sector : str
+        Name of sector (eg. hh, ghd)
     carrier : str
          Name of carrier (eg.: heat_central, heat_decentral)
-    holidays : dict
-        Dictionary with holidays
-    temperature : DataFrame
-         DataFrame with temperatures
+    heat_load : DataFrame
+         DataFrame of heat load profile
     yearly_demands: DataFrame
          DataFrame with yearly demands per consumer
-    building_class : str
-         Building class (German: Baualtersklasse) can assume values in range 1-11
-         eg. 5 in case of BB and 3 in case of B
+    shares : dict[str, float]
+        Mapping from building type share (eg.: 'ghd','sfh')
 
     Returns
     -------
     heat_load_total : pd.DataFrame
-         DataFrame with total normalized heat load in year aggretated by consumers
-         (eg.: ghd, efh, mfh)
+         DataFrame with total heat load in year for a consumer
+         (eg.: ghd, sfh)
 
     """
-    # Add empty DataFrame for yearly heat loads
-    heat_load_total = pd.DataFrame()
-
-    # Add DataFrame time index for consumers heat loads
-    heat_load_consumer = pd.DataFrame(
+    # Calculate heat load profile of year
+    heat_load_sector = pd.DataFrame(
         index=pd.date_range(
-            datetime.datetime(year, 1, 1, 0), periods=len(temperature), freq="H"
+            datetime.datetime(year, 1, 1, 0), periods=len(heat_load), freq="h"
         )
     )
 
-    # Calculate sfh (efh: Einfamilienhaus) heat load
-    heat_load_consumer["efh" + "_" + carrier] = bdew.HeatBuilding(
-        heat_load_consumer.index,
-        holidays=holidays,
-        temperature=temperature,
-        shlp_type="EFH",
-        building_class=building_class,
-        wind_class=0,
-        annual_heat_demand=share_efh * yearly_demands["hh" + "_" + carrier][0],
-        name="EFH",
-        ww_incl=True,
-    ).get_bdew_profile()
+    if carrier == "heat_decentral":
+        if sector == "sfh":
+            heat_load_sector[f"sfh_{carrier}"] = (
+                    heat_load["heat_demand"]
+                    * shares[sector]
+                    * yearly_demands["hh" + "_" + carrier][0]
+            )
+        else:
+            return pd.DataFrame()
 
-    # Calculate mfh (mfh: Mehrfamilienhaus) heat load
-    heat_load_consumer["mfh" + "_" + carrier] = bdew.HeatBuilding(
-        heat_load_consumer.index,
-        holidays=holidays,
-        temperature=temperature,
-        shlp_type="MFH",
-        building_class=building_class,
-        wind_class=0,
-        annual_heat_demand=share_mfh * yearly_demands["hh" + "_" + carrier][0],
-        name="MFH",
-        ww_incl=True,
-    ).get_bdew_profile()
+    elif carrier == "heat_central":
+        if sector == "sfh":
+            return pd.DataFrame()
+        if sector in ["ghd", "office", "lab", "uni"]:
+            heat_load_sector[f"{sector}_{carrier}"] = (
+                    heat_load["heat_demand"]
+                    * yearly_demands[sector + "_" + carrier][0]
+                    * shares[sector]
+            )
+        elif sector == "mfh":
+            heat_load_sector[f"mfh_{carrier}"] = (
+                    heat_load["heat_demand"]
+                    * shares[sector]
+                    * yearly_demands["hh" + "_" + carrier][0]
+            )
+    else:
+        raise ValueError(
+            f"Sector '{sector}' not recognized. Please check the demand file name."
+        )
 
-    # Calculate industry, trade, service (ghd: Gewerbe, Handel, Dienstleistung)
-    # heat load using gha profile of retail and wholesale (Einzel- und Großhandel)
-    # which has lower share of process heat
-    heat_load_consumer["ghd" + "_" + carrier] = bdew.HeatBuilding(
-        heat_load_consumer.index,
-        holidays=holidays,
-        temperature=temperature,
-        shlp_type="GHA",
-        wind_class=0,
-        annual_heat_demand=yearly_demands["ghd" + "_" + carrier][0],
-        name="ghd",
-        ww_incl=True,
-    ).get_bdew_profile()
-
-    # Calculate total heat load in year
-    heat_load_total[carrier + "-demand-profile"] = heat_load_consumer.sum(axis=1)
-
-    # Normalize heat load profile
-    heat_load_total[carrier + "-demand-profile"] = np.divide(
-        heat_load_total[carrier + "-demand-profile"],
-        heat_load_total[carrier + "-demand-profile"].sum(),
-    )
-
-    return heat_load_total
+    return heat_load_sector
 
 
 if __name__ == "__main__":
