@@ -235,7 +235,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
         Unit of total demands (eg. GWh)
 
     """
-    consumers = ["ghd", "hh"]
+    consumers = ["ghd", "hh", "office", "lab", "uni"]
     demands = pd.DataFrame()
 
     sc_filtered = dp.filter_df(scalars, "type", "load")
@@ -253,7 +253,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
     if not (sc_filtered["var_unit"].values[0] == sc_filtered["var_unit"].values).all():
         raise ValueError(
             f"Unit mismatch in scalar data of heat demands. "
-            f"Please make sure units match in {in_path5}."
+            f"Please make sure units match in {in_path3}."
         )
 
     demand_unit = list(set(sc_filtered["var_unit"]))
@@ -264,7 +264,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
         if len(sc_filtered_consumer) > 1:
             logger.warning(
                 f"There is duplicate demand of carrier '{carrier}', consumer "
-                f"'{consumer}', region '{region}' and scenario '{scenario}' in {in_path5}."
+                f"'{consumer}', region '{region}' and scenario '{scenario}' in {in_path3}."
                 + "\n"
                 + "The demand is going to be summed up. "
                 "Otherwise you have to rerun the calculation and provide only one demand of the "
