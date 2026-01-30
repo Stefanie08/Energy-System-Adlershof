@@ -312,9 +312,9 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
     if carrier == "heat_decentral":
         if sector == "sfh":
             heat_load_sector[f"sfh_{carrier}"] = (
-                    heat_load["heat_demand"]
-                    * shares[sector]
-                    * yearly_demands["hh" + "_" + carrier][0]
+                heat_load["heat_demand"]
+                * shares[sector]
+                * yearly_demands["hh" + "_" + carrier][0]
             )
         else:
             return pd.DataFrame()
@@ -324,15 +324,15 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
             return pd.DataFrame()
         if sector in ["ghd", "office", "lab", "uni"]:
             heat_load_sector[f"{sector}_{carrier}"] = (
-                    heat_load["heat_demand"]
-                    * yearly_demands[sector + "_" + carrier][0]
-                    * shares[sector]
+                heat_load["heat_demand"]
+                * yearly_demands[sector + "_" + carrier][0]
+                * shares[sector]
             )
         elif sector == "mfh":
             heat_load_sector[f"mfh_{carrier}"] = (
-                    heat_load["heat_demand"]
-                    * shares[sector]
-                    * yearly_demands["hh" + "_" + carrier][0]
+                heat_load["heat_demand"]
+                * shares[sector]
+                * yearly_demands["hh" + "_" + carrier][0]
             )
     else:
         raise ValueError(
@@ -395,9 +395,7 @@ if __name__ == "__main__":
 
         demand_file_names = find_regional_files(in_path1, region)
 
-        for demand_file_name, carrier in itertools.product(
-            demand_file_names, CARRIERS
-        ):
+        for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
             # Read year from weather file name
             year = get_year(demand_file_name)
 
@@ -436,7 +434,7 @@ if __name__ == "__main__":
 
             for col in heat_load_consumer.columns:
                 heat_load_consumer_total[col] = (
-                        heat_load_consumer_total.get(col, 0) + heat_load_consumer[col]
+                    heat_load_consumer_total.get(col, 0) + heat_load_consumer[col]
                 )
 
         frames = []
@@ -470,7 +468,9 @@ if __name__ == "__main__":
 
     # aggregate heat demand for different sectors (hh, ghd, i)
     demand_per_sector = dp.filter_df(
-        sc, "tech", ["demand_hh", "demand_ghd", "demand_office", "demand_lab", "demand_uni"]
+        sc,
+        "tech",
+        ["demand_hh", "demand_ghd", "demand_office", "demand_lab", "demand_uni"],
     )
     aggregated_demands = dp.aggregate_scalars(
         demand_per_sector,
