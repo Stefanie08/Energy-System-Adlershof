@@ -386,6 +386,7 @@ if __name__ == "__main__":
     total_heat_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     # create empty data frame for yearly demands
+    # Todo: hard coded 2050, make flexible
     heat_load_consumer_total = pd.DataFrame(
         index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
     )
@@ -413,10 +414,10 @@ if __name__ == "__main__":
                 "var_unit": sc_demand_unit,
             }
 
-            # rename col names of load data
+            # Rename col names of load data
             heat_load = rename_load_data(os.path.join(in_path1, demand_file_name), year)
 
-            # calculate heat load profile for consumer and carrier
+            # Calculate heat load profile for consumer and carrier
             heat_load_consumer = calculate_heat_load(
                 sector,
                 carrier,
@@ -439,7 +440,7 @@ if __name__ == "__main__":
 
         frames = []
 
-        # sum up and format the central heat demand
+        # Sum up and format the central heat demand
         central_cols = [
             c for c in heat_load_consumer_total if c.endswith("_heat_central")
         ]
@@ -453,7 +454,7 @@ if __name__ == "__main__":
                 )
             )
 
-        # change format of the decentral heat demand
+        # Change format of the decentral heat demand
         if "sfh_heat_decentral" in heat_load_consumer_total:
             frames.append(
                 dp.prepare_b3_timeseries(
@@ -466,7 +467,7 @@ if __name__ == "__main__":
 
         total_heat_load = pd.concat([total_heat_load, *frames], ignore_index=True)
 
-    # aggregate heat demand for different sectors (hh, ghd, i)
+    # Aggregate heat demand for different sectors (hh, ghd, i)
     demand_per_sector = dp.filter_df(
         sc,
         "tech",
