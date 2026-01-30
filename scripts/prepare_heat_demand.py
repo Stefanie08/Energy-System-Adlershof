@@ -342,6 +342,22 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
     return heat_load_sector
 
 
+def rename_load_data(load, year):
+    load = pd.read_csv(load, delimiter=",")
+    load = load.rename(columns={"Wärme gesamt (kW)": "heat_demand"})
+    load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
+    load = load.rename(columns={"Kälte gesamt (kW)": "cold_demand"})
+    load = load.rename(columns={"Strom gesamt (kW)": "electricity_demand"})
+
+    # change format of datetime col to yyyy-mm-dd hh:mm:ss
+    load["datetime"] = pd.to_datetime(load["datetime"], format="%d-%m %H:%M")
+    load["datetime"] = load["datetime"].apply(lambda x: x.replace(year=year))
+    load = load.set_index(load["datetime"])
+    load = load.drop(["datetime"], axis=1)
+
+    return load
+
+
 if __name__ == "__main__":
     in_path1 = sys.argv[1]  # path to heat load data
     in_path2 = sys.argv[2]  # path to building distributions data
@@ -369,32 +385,29 @@ if __name__ == "__main__":
     # Create empty data frame for results / output
     total_heat_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
+    # create empty data frame for yearly demands
+    heat_load_consumer_total = pd.DataFrame(
+        index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
+    )
+
     for region, scenario in itertools.product(regions, scenarios):
-        share_efh, share_mfh = get_shares_building_distribution(in_path2, region)
+        shares = get_shares_building_distribution(in_path2, region)
 
-        weather_file_names = find_regional_files(in_path1, region)
+        demand_file_names = find_regional_files(in_path1, region)
 
-        for weather_file_name, carrier in itertools.product(
-            weather_file_names, CARRIERS
+        for demand_file_name, carrier in itertools.product(
+            demand_file_names, CARRIERS
         ):
             # Read year from weather file name
-            year = get_year(weather_file_name)
-
-            # Read temperature from weather data
-            path_weather_data = os.path.join(in_path1, weather_file_name)
-            temperature = pd.read_csv(path_weather_data, usecols=["temp_air"], header=0)
-
-            # Get building class
-            building_class = get_building_class(region, in_path4)
+            year = get_year(demand_file_name)
 
             # Get heat demand in region and scenario
             yearly_demands, sc_demand_unit = get_heat_demand(
                 sc, scenario, carrier, region
             )
 
-            heat_load_year = calculate_heat_load(
-                carrier, holidays, temperature, yearly_demands, building_class
-            )
+            # Get sector name from file
+            sector = demand_file_name.split("_", 1)[0]
 
             heat_load_ts_info = {
                 "region": region,
@@ -402,18 +415,62 @@ if __name__ == "__main__":
                 "var_unit": sc_demand_unit,
             }
 
-            heat_load_year = dp.prepare_b3_timeseries(
-                heat_load_year, **heat_load_ts_info
+            # rename col names of load data
+            heat_load = rename_load_data(os.path.join(in_path1, demand_file_name), year)
+
+            # calculate heat load profile for consumer and carrier
+            heat_load_consumer = calculate_heat_load(
+                sector,
+                carrier,
+                heat_load,
+                yearly_demands,
+                shares,
             )
 
-            # Append stacked heat load of year to stacked time series with total heat load
-            total_heat_load = pd.concat(
-                [total_heat_load, heat_load_year], ignore_index=True, sort=False
+            if heat_load_consumer.empty:
+                continue
+
+            heat_load_consumer = heat_load_consumer.reindex(
+                heat_load_consumer_total.index
             )
+
+            for col in heat_load_consumer.columns:
+                heat_load_consumer_total[col] = (
+                        heat_load_consumer_total.get(col, 0) + heat_load_consumer[col]
+                )
+
+        frames = []
+
+        # sum up and format the central heat demand
+        central_cols = [
+            c for c in heat_load_consumer_total if c.endswith("_heat_central")
+        ]
+        if central_cols:
+            frames.append(
+                dp.prepare_b3_timeseries(
+                    heat_load_consumer_total[central_cols]
+                    .sum(axis=1)
+                    .to_frame("heat_central-profile"),
+                    **heat_load_ts_info,
+                )
+            )
+
+        # change format of the decentral heat demand
+        if "sfh_heat_decentral" in heat_load_consumer_total:
+            frames.append(
+                dp.prepare_b3_timeseries(
+                    heat_load_consumer_total[["sfh_heat_decentral"]].rename(
+                        columns={"sfh_heat_decentral": "heat_decentral-profile"}
+                    ),
+                    **heat_load_ts_info,
+                )
+            )
+
+        total_heat_load = pd.concat([total_heat_load, *frames], ignore_index=True)
 
     # aggregate heat demand for different sectors (hh, ghd, i)
     demand_per_sector = dp.filter_df(
-        sc, "tech", ["demand_hh", "demand_ghd", "demand_i"]
+        sc, "tech", ["demand_hh", "demand_ghd", "demand_office", "demand_lab", "demand_uni"]
     )
     aggregated_demands = dp.aggregate_scalars(
         demand_per_sector,
