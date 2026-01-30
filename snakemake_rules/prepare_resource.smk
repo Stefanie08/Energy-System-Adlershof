@@ -58,17 +58,15 @@ rule prepare_cop_timeseries:
 
 rule prepare_heat_demand:
     input:
-        weather="raw/weatherdata",
-        distribution_hh="raw/distribution_households.csv",
-        holidays="raw/holidays.csv",
-        building_class="raw/building_class.csv",
+        heat_load="raw/heat_load",
+        distribution_buildings="raw/distribution_households.csv",
         scalars="raw/scalars/demands.csv",
     output:
         scalars="results/_resources/scal_load_heat.csv",
         timeseries="results/_resources/ts_load_heat.csv",
     params:
         logfile="results/_resources/load_heat.log"
-    shell: "python scripts/prepare_heat_demand.py {input.weather} {input.distribution_hh} {input.holidays} {input.building_class} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
+    shell: "python scripts/prepare_heat_demand.py {input.weather} {input.distribution_buildings} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
 
 rule prepare_re_potential:
     input:
