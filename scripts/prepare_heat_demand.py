@@ -152,41 +152,6 @@ def get_year(file_name):
     return year
 
 
-def get_holidays(year, region, path_holidays):
-    """
-    This function determines all holidays of a given region in a given year
-
-    Parameters
-    ----------
-    path_holidays : str
-        Input path
-    year : int
-        Year
-
-    Returns
-    -------
-    holidays_dict : dict
-        Dictionary with holidays
-
-    """
-    # Read all national holidays per state
-    all_holidays = pd.read_csv(path_holidays)
-    holidays_dict = {}
-
-    # Get holidays in region
-    holidays_filtered = all_holidays.loc[all_holidays["year"] == year]
-    holidays_filtered = holidays_filtered[
-        holidays_filtered["region"].str.contains(region)
-    ]
-
-    for row in holidays_filtered.iterrows():
-        holidays_dict[
-            datetime.date(row[1]["year"], row[1]["month"], row[1]["day"])
-        ] = row[1]["holiday"]
-
-    return holidays_dict
-
-
 def get_building_class(region, path_building_class):
     """
     This function reads building classes of German states from input path
@@ -402,20 +367,18 @@ def calculate_heat_load(carrier, holidays, temperature, yearly_demands, building
 
 
 if __name__ == "__main__":
-    in_path1 = sys.argv[1]  # path to weather data
-    in_path2 = sys.argv[2]  # path to household distributions data
-    in_path3 = sys.argv[3]  # path to holidays
-    in_path4 = sys.argv[4]  # path to building class
-    in_path5 = sys.argv[5]  # path to csv with b3 scalars
-    out_path1 = sys.argv[6]
-    out_path2 = sys.argv[7]
+    in_path1 = sys.argv[1]  # path to heat load data
+    in_path2 = sys.argv[2]  # path to building distributions data
+    in_path3 = sys.argv[3]  # path to csv with b3 scalars
+    out_path1 = sys.argv[4]
+    out_path2 = sys.argv[5]
 
     logger = config.add_snake_logger("prepare_heat_demand")
 
     CARRIERS = ["heat_central", "heat_decentral"]
 
     # Read state heat demands of ghd and hh sectors
-    sc = dp.load_b3_scalars(in_path5)
+    sc = dp.load_b3_scalars(in_path3)
 
     # filter for heat demand data
     sc_filtered = dp.filter_df(sc, "type", "load")
@@ -440,9 +403,6 @@ if __name__ == "__main__":
         ):
             # Read year from weather file name
             year = get_year(weather_file_name)
-
-            # Get holidays
-            holidays = get_holidays(year, region, in_path3)
 
             # Read temperature from weather data
             path_weather_data = os.path.join(in_path1, weather_file_name)
