@@ -54,11 +54,11 @@ import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
 
 
-def get_shares_from_hh_distribution(path, region):
+def get_shares_building_distribution(path, region):
     """
-    This function calculates the share of single family houses (Einfamilienhaus: efh)
-    and multi-family houses (Mehrfamilienhaus: mfh) from the household distribution
-    in input data
+    This function calculates the share of single family houses (Einfamilienhaus: efh),
+    multi-family houses (Mehrfamilienhaus: mfh), labs, universities, offices, and commercial,
+    trade, and services (GHD) from the building distribution in input data
 
     Parameters
     ----------
@@ -70,26 +70,23 @@ def get_shares_from_hh_distribution(path, region):
 
     Returns
     -------
-    share_efh : float
-        Share of efh in household distribution
-
-    share_mfh : float
-        Share of mfh in household distribution
+    shares : dict[str, float]
+        Mapping from building type ('sfh', 'mfh', 'lab', 'uni', 'office', 'ghd')
+        to its relative share in the total building distribution.
     """
     # Get share of EFH and MFH from distribution of households
     distribution_hh = pd.read_csv(path)
     distribution_hh_reg = distribution_hh[distribution_hh["region"] == region]
+    sectors = ["sfh", "mfh", "ghd", "office", "lab", "uni"]
+    hh_total = np.sum(
+        distribution_hh_reg[sectors].values,
+        axis=1,
+    )
+    shares = {
+        sector: distribution_hh_reg[sector].values[0] / hh_total for sector in sectors
+    }
 
-    share_efh = (
-        distribution_hh_reg["sfh"]
-        / np.add(distribution_hh_reg["sfh"], distribution_hh_reg["mfh"])
-    ).values[0]
-    share_mfh = (
-        distribution_hh_reg["mfh"]
-        / np.add(distribution_hh_reg["sfh"], distribution_hh_reg["mfh"])
-    ).values[0]
-
-    return share_efh, share_mfh
+    return shares
 
 
 def find_regional_files(path, region):
@@ -434,7 +431,7 @@ if __name__ == "__main__":
     total_heat_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     for region, scenario in itertools.product(regions, scenarios):
-        share_efh, share_mfh = get_shares_from_hh_distribution(in_path2, region)
+        share_efh, share_mfh = get_shares_building_distribution(in_path2, region)
 
         weather_file_names = find_regional_files(in_path1, region)
 
