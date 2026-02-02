@@ -66,7 +66,7 @@ rule prepare_heat_demand:
         timeseries="results/_resources/ts_load_heat.csv",
     params:
         logfile="results/_resources/load_heat.log"
-    shell: "python scripts/prepare_heat_demand.py {input.weather} {input.distribution_buildings} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
+    shell: "python scripts/prepare_heat_demand.py {input.heat_load} {input.distribution_buildings} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
 
 rule prepare_re_potential:
     input:
