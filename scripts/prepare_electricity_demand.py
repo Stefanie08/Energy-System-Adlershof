@@ -121,23 +121,41 @@ def get_electricity_demand(scalars, scenario, carrier, region):
     return demands, demand_unit
 
 
+def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carrier):
+    """
+    This function calculates the electricity load for each sector and carrier by multiplying
+    the load profile with the share of the sector in the building distribution and the total
+    yearly demand of the sector.
+
+    Parameters
+    ----------
+    load_data : pd.DataFrame
+        DataFrame with load profile data
+
+    shares : dict[str, float]
+        Mapping from building type ('sfh', 'mfh', 'lab', 'uni', 'office', 'ghd')
+        to its relative share in the total building distribution.
+    yearly_demands : dict[str, float]
+        Mapping from sector name to total yearly demand of the sector in the region and scenario.
+    sector : str
+        Sector name (eg. 'sfh', 'mfh', 'lab', 'uni
+        'office', 'ghd')
+
+    Returns
+    -------
+    electricity_load : pd.DataFrame
+        DataFrame with electricity load for each sector and carrier.
+    """
+    # Calculate electricity load profile of year
+    electricity_load_sector = pd.DataFrame(
+        index=pd.date_range(
+            datetime.datetime(year, 1, 1, 0), periods=len(electricity_load), freq="h"
+        )
     )
 
-    # add additional information as required by template
-    ts_prepared.loc[:, "region"] = region
-    ts_prepared.loc[
-        :, "var_unit"
-    ] = config.settings.prepare_electricity_demand.ts_var_unit
-    ts_prepared.loc[:, "var_name"] = config.settings.prepare_electricity_demand.var_name
-    ts_prepared.loc[:, "source"] = config.settings.prepare_electricity_demand.ts_source
-    ts_prepared.loc[
-        :, "comment"
-    ] = config.settings.prepare_electricity_demand.ts_comment
-    ts_prepared.loc[
-        :, "scenario_key"
-    ] = "ALL"  # The profile is not varied in different scenarios
+    electricity_load_sector[sector + "_" + carrier] = electricity_load["electricity_demand"] * shares[sector] * yearly_demands[carrier].values
 
-    return ts_prepared
+    return electricity_load_sector
 
 
 if __name__ == "__main__":
