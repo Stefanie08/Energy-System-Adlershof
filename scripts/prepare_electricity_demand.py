@@ -27,10 +27,15 @@ Note: the electricity demand profile for electric vehicle charging is prepared i
 """
 
 import sys
-import pandas as pd
 import os
+import datetime
+import itertools
+
+import pandas as pd
 import oemof_b3.tools.data_processing as dp
+
 from oemof_b3.config import config
+from scripts.prepare_heat_demand import get_year, find_regional_files, get_shares_building_distribution
 
 
 def prepare_load_profile_time_series(ts_raw, year, region):
