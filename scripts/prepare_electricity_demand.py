@@ -14,7 +14,7 @@ pandas.DataFrame
     with normalized load data of 50Hertz region in Germany from the years 2015, 2016, 2017, 2018
     and 2019. The data is normalized with the total electricity demand of the corresponding year.
 
-Description
+Description Todo:Change description
 -------------
 The corresponding snakemake rule of the preparation of the electricity demand profile
 downloads the 60 min timeseries data from OPSD and keeps it locally.
@@ -40,8 +40,8 @@ from scripts.prepare_heat_demand import get_year, find_regional_files, get_share
 
 def prepare_electricity_load_data(load, year):
     """
-    This function reads the load data from the given file, changes the format of the datetime column to
-    yyyy-mm-dd hh:mm:ss, sets the datetime column as index and converts the load from kW to MW.
+    This function reads the load data, changes the format of the datetime column to
+    yyyy-mm-dd hh:mm:ss, and sets the datetime column as index and converts the load from kW to MW.
 
     Parameters
     ----------
@@ -171,29 +171,89 @@ if __name__ == "__main__":
     # initialize data frame
     time_series_df = pd.DataFrame()
 
-    # download raw time series from OPSD
-    ts_raw = pd.read_csv(opsd_ts_data, index_col=0)
-    ts_raw.index = pd.to_datetime(ts_raw.index, utc=True)
-    # filter for 50hertz actual load
-    ts_raw = ts_raw[[config.settings.prepare_electricity_demand.col_select]]
+    # Read state demand of all sectors
+    sc = dp.load_b3_scalars(scalars)
+
+    CARRIERS = ["electricity"]
+
+    # filter for electricity data
+    sc_filtered = dp.filter_df(sc, "type", "load")
+
+    sc_filtered = dp.filter_df(sc_filtered, "carrier", CARRIERS)
+
+    sc_filtered = dp.filter_df(sc_filtered, "tech", "demand")
+
+    # get regions from data
+    regions = sc_filtered.loc[:, "region"].unique()
+
+    scenarios = sc_filtered.loc[:, "scenario_key"].unique()
+
+    # Create empty data frame for results / output
+    ex_df = pd.DataFrame()
+    total_electricity_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
+
+    ts_data = pd.DataFrame(
+        index=pd.date_range(
+            datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
+    )
 
     # prepare time series for each year and region
-    for year in config.settings.prepare_electricity_demand.opsd_years:
-        for region in config.settings.prepare_electricity_demand.regions:
-            # prepare opsd 50hertz actual load time series
-            load_ts = prepare_load_profile_time_series(
-                ts_raw=ts_raw, year=year, region=region
+    for region, scenario in itertools.product(regions, scenarios):
+        shares = get_shares_building_distribution(building_share, region)
+
+        demand_file_names = find_regional_files(electricity_ts_data, region)
+
+        for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
+            # Read year from weather file name
+            year = get_year(demand_file_name)
+
+            # Get heat demand in region and scenario
+            yearly_demands, sc_demand_unit = get_electricity_demand(
+                sc_filtered, scenario, carrier, region
             )
 
-            # add time series to `time_series_df`
-            time_series_df = pd.concat([time_series_df, load_ts], axis=0)
+            # Get sector name from file
+            sector = demand_file_name.split("_", 1)[0]
 
-    # set index
-    time_series_df.reset_index(drop=True, inplace=True)
-    time_series_df.index.name = config.settings.general.ts_index_name
+            electricity_load_ts_info = {
+                "region": region,
+                "scenario_key": scenario,
+                "var_unit": sc_demand_unit,
+            }
 
-    # create output directory in case it does not exist, yet and save data to `output_file`
+            # Rename col names of load data
+            electricity_load_data = prepare_electricity_load_data(
+                os.path.join(electricity_ts_data, demand_file_name),
+                year)
+
+            # calculate the electricity load for the sector
+            electricity_load = calc_electricity_load(
+                electricity_load_data, shares, yearly_demands, sector, carrier)
+
+            ex_df[sector + "_" + carrier] = (
+                    electricity_load.get("electricity_demand", 0)
+                    + electricity_load
+            )
+        # sum up all sectors to get total electricity demand
+        ts_data["electricity-demand-profile"] = (ex_df.sum(axis=1))
+
+        frames = []
+        # Use prepare_b3_timeseries like you did for heat demand
+        frames.append(
+            dp.prepare_b3_timeseries(
+                ts_data[["electricity-demand-profile"]],
+                **electricity_load_ts_info,
+            )
+        )
+
+        total_electricity_load = pd.concat([total_electricity_load, *frames], ignore_index=True)
+
+        # set index
+        total_electricity_load.reset_index(drop=True, inplace=True)
+        total_electricity_load.index.name = config.settings.general.ts_index_name
+
+        # create output directory in case it does not exist, yet and save data to `output_file`
     output_dir = os.path.dirname(output_file)
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    dp.save_df(time_series_df, output_file)
+    dp.save_df(total_electricity_load, output_file)
