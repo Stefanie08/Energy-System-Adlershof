@@ -123,7 +123,7 @@ def get_electricity_demand(scalars, scenario, carrier, region):
 
 def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carrier):
     """
-    This function calculates the electricity load for each sector and carrier by multiplying
+    This function calculates the electricity load by multiplying
     the load profile with the share of the sector in the building distribution and the total
     yearly demand of the sector.
 
