@@ -48,7 +48,6 @@ import sys
 
 import numpy as np
 import pandas as pd
-from demandlib import bdew
 
 import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
@@ -75,16 +74,14 @@ def get_shares_building_distribution(path, region):
         to its relative share in the total building distribution.
     """
     # Get share of EFH and MFH from distribution of households
-    distribution_hh = pd.read_csv(path)
-    distribution_hh_reg = distribution_hh[distribution_hh["region"] == region]
-    sectors = ["sfh", "mfh", "ghd", "office", "lab", "uni"]
-    hh_total = np.sum(
-        distribution_hh_reg[sectors].values,
-        axis=1,
-    )
-    shares = {
-        sector: distribution_hh_reg[sector].values[0] / hh_total for sector in sectors
-    }
+    distribution_building = pd.read_csv(path)
+    distribution_building_area = distribution_building[
+        distribution_building["region"] == region
+    ]
+
+    shares = distribution_building_area.set_index("region").to_dict(orient="index")[
+        region
+    ]
 
     return shares
 
@@ -342,7 +339,7 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
     return heat_load_sector
 
 
-def rename_load_data(load, year):
+def prepare_heat_load_data(load, year):
     load = pd.read_csv(load, delimiter=",")
     load = load.rename(columns={"Wärme gesamt (kW)": "heat_demand"})
     load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
@@ -354,6 +351,9 @@ def rename_load_data(load, year):
     load["datetime"] = load["datetime"].apply(lambda x: x.replace(year=year))
     load = load.set_index(load["datetime"])
     load = load.drop(["datetime"], axis=1)
+
+    # convert from kW to MW Todo: hard coded
+    load["heat_demand"] = load["heat_demand"] / 1000
 
     return load
 
@@ -386,7 +386,7 @@ if __name__ == "__main__":
     total_heat_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     # create empty data frame for yearly demands
-    # Todo: hard coded 2050, make flexible
+    # Todo: hard coded 2050, make flexible --> settings
     heat_load_consumer_total = pd.DataFrame(
         index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
     )
@@ -415,7 +415,9 @@ if __name__ == "__main__":
             }
 
             # Rename col names of load data
-            heat_load = rename_load_data(os.path.join(in_path1, demand_file_name), year)
+            heat_load = prepare_heat_load_data(
+                os.path.join(in_path1, demand_file_name), year
+            )
 
             # Calculate heat load profile for consumer and carrier
             heat_load_consumer = calculate_heat_load(
@@ -449,7 +451,7 @@ if __name__ == "__main__":
                 dp.prepare_b3_timeseries(
                     heat_load_consumer_total[central_cols]
                     .sum(axis=1)
-                    .to_frame("heat_central-profile"),
+                    .to_frame("heat_central-demand-profile"),
                     **heat_load_ts_info,
                 )
             )
@@ -459,7 +461,7 @@ if __name__ == "__main__":
             frames.append(
                 dp.prepare_b3_timeseries(
                     heat_load_consumer_total[["sfh_heat_decentral"]].rename(
-                        columns={"sfh_heat_decentral": "heat_decentral-profile"}
+                        columns={"sfh_heat_decentral": "heat_decentral-demand-profile"}
                     ),
                     **heat_load_ts_info,
                 )
