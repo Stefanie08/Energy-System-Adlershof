@@ -146,7 +146,7 @@ def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carr
     electricity_load : pd.DataFrame
         DataFrame with electricity load for each sector and carrier.
     """
-    # Calculate electricity load profile of year
+    # calculate electricity load profile of year
     electricity_load_sector = pd.DataFrame(
         index=pd.date_range(
             datetime.datetime(year, 1, 1, 0), periods=len(electricity_load), freq="h"
@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
     scenarios = sc_filtered.loc[:, "scenario_key"].unique()
 
-    # Create empty data frame for results / output
+    # create empty data frame for results / output
     ex_df = pd.DataFrame()
     total_electricity_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
@@ -204,15 +204,15 @@ if __name__ == "__main__":
         demand_file_names = find_regional_files(electricity_ts_data, region)
 
         for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
-            # Read year from weather file name
+            # read year from weather file name
             year = get_year(demand_file_name)
 
-            # Get heat demand in region and scenario
+            # get heat demand in region and scenario
             yearly_demands, sc_demand_unit = get_electricity_demand(
                 sc_filtered, scenario, carrier, region
             )
 
-            # Get sector name from file
+            # get sector name from file
             sector = demand_file_name.split("_", 1)[0]
 
             electricity_load_ts_info = {
@@ -221,7 +221,7 @@ if __name__ == "__main__":
                 "var_unit": sc_demand_unit,
             }
 
-            # Rename col names of load data
+            # rename col names of load data
             electricity_load_data = prepare_electricity_load_data(
                 os.path.join(electricity_ts_data, demand_file_name),
                 year)
@@ -238,7 +238,6 @@ if __name__ == "__main__":
         ts_data["electricity-demand-profile"] = (ex_df.sum(axis=1))
 
         frames = []
-        # Use prepare_b3_timeseries like you did for heat demand
         frames.append(
             dp.prepare_b3_timeseries(
                 ts_data[["electricity-demand-profile"]],
