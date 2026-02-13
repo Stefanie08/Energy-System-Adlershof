@@ -35,7 +35,11 @@ import pandas as pd
 import oemof_b3.tools.data_processing as dp
 
 from oemof_b3.config import config
-from scripts.prepare_heat_demand import get_year, find_regional_files, get_shares_building_distribution
+from scripts.prepare_heat_demand import (
+    get_year,
+    find_regional_files,
+    get_shares_building_distribution,
+)
 
 
 def prepare_electricity_load_data(load, year):
@@ -154,9 +158,9 @@ def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carr
     )
 
     electricity_load_sector[sector + "_" + carrier] = (
-            electricity_load["electricity_demand"]
-            * shares[sector]
-            * yearly_demands[carrier].values
+        electricity_load["electricity_demand"]
+        * shares[sector]
+        * yearly_demands[carrier].values
     )
 
     return electricity_load_sector
@@ -193,8 +197,7 @@ if __name__ == "__main__":
     total_electricity_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     ts_data = pd.DataFrame(
-        index=pd.date_range(
-            datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
+        index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
     )
 
     # prepare time series for each year and region
@@ -223,19 +226,19 @@ if __name__ == "__main__":
 
             # rename col names of load data
             electricity_load_data = prepare_electricity_load_data(
-                os.path.join(electricity_ts_data, demand_file_name),
-                year)
+                os.path.join(electricity_ts_data, demand_file_name), year
+            )
 
             # calculate the electricity load for the sector
             electricity_load = calc_electricity_load(
-                electricity_load_data, shares, yearly_demands, sector, carrier)
+                electricity_load_data, shares, yearly_demands, sector, carrier
+            )
 
             ex_df[sector + "_" + carrier] = (
-                    electricity_load.get("electricity_demand", 0)
-                    + electricity_load
+                electricity_load.get("electricity_demand", 0) + electricity_load
             )
         # sum up all sectors to get total electricity demand
-        ts_data["electricity-demand-profile"] = (ex_df.sum(axis=1))
+        ts_data["electricity-demand-profile"] = ex_df.sum(axis=1)
 
         frames = []
         frames.append(
@@ -245,7 +248,9 @@ if __name__ == "__main__":
             )
         )
 
-        total_electricity_load = pd.concat([total_electricity_load, *frames], ignore_index=True)
+        total_electricity_load = pd.concat(
+            [total_electricity_load, *frames], ignore_index=True
+        )
 
         # set index
         total_electricity_load.reset_index(drop=True, inplace=True)
