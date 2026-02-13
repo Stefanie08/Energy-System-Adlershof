@@ -26,10 +26,11 @@ rule prepare_feedin:
 
 rule prepare_electricity_demand:
     input:
-        opsd_url=HTTP.remote("https://data.open-power-system-data.org/time_series/2020-10-06/time_series_60min_singleindex.csv",
-                            keep_local=True),
+        electricity_load="raw/electricity_load",
+        scalars="raw/scalars/demands.csv",
+        distribution_buildings="raw/distribution_households.csv",
     output: "results/_resources/ts_load_electricity.csv"
-    shell: "python scripts/prepare_electricity_demand.py {input.opsd_url} {output}"
+    shell: "python scripts/prepare_electricity_demand.py {input.electricity_load} {input.scalars} {input.distribution_buildings} {output}"
 
 rule prepare_vehicle_charging_demand:
     input:
