@@ -39,6 +39,22 @@ from scripts.prepare_heat_demand import get_year, find_regional_files, get_share
 
 
 def prepare_electricity_load_data(load, year):
+    """
+    This funcition reads the load data from the given file, changes the format of the datetime column to
+    yyyy-mm-dd hh:mm:ss, sets the datetime column as index and converts the load from kW to MW.
+
+    Parameters
+    ----------
+    load : DataFrame
+        Dataframe electricity load data
+    year : str
+        Year e.g. "2050"
+
+    Returns
+    -------
+    load : DataFrame
+        Dataframe with renamed header and datetime column as index, load in MW
+    """
     load = pd.read_csv(load, delimiter=",")
     load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
     load = load.rename(columns={"Zone 1 (kW)": "electricity_demand"})
