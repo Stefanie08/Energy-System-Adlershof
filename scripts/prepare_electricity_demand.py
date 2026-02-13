@@ -153,7 +153,11 @@ def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carr
         )
     )
 
-    electricity_load_sector[sector + "_" + carrier] = electricity_load["electricity_demand"] * shares[sector] * yearly_demands[carrier].values
+    electricity_load_sector[sector + "_" + carrier] = (
+            electricity_load["electricity_demand"]
+            * shares[sector]
+            * yearly_demands[carrier].values
+    )
 
     return electricity_load_sector
 
