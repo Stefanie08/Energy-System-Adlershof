@@ -88,8 +88,10 @@ def prepare_load_profile_time_series(ts_raw, year, region):
 
 
 if __name__ == "__main__":
-    opsd_ts_data = sys.argv[1]
-    output_file = sys.argv[2]
+    electricity_ts_data = sys.argv[1]
+    scalars = sys.argv[2]
+    building_share = sys.argv[3]
+    output_file = sys.argv[4]
 
     # initialize data frame
     time_series_df = pd.DataFrame()
