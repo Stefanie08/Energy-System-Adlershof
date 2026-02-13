@@ -40,7 +40,7 @@ from scripts.prepare_heat_demand import get_year, find_regional_files, get_share
 
 def prepare_electricity_load_data(load, year):
     """
-    This funcition reads the load data from the given file, changes the format of the datetime column to
+    This function reads the load data from the given file, changes the format of the datetime column to
     yyyy-mm-dd hh:mm:ss, sets the datetime column as index and converts the load from kW to MW.
 
     Parameters
@@ -70,36 +70,57 @@ def prepare_electricity_load_data(load, year):
 
     return load
 
+
+def get_electricity_demand(scalars, scenario, carrier, region):
+    """
+    This function returns the electricity demands together with their unit of a given region and a
+    given scenario.
+
     Parameters
     ----------
-    ts_raw : pd.DataFrame
-        Contains actual load data from 50hertz region from opsd load data
-    year : int
-        Year for which time series is extracted from raw data in `ts_raw`
+    scalars : DataFrame
+        Dataframe with scalars
+    scenario : str
+        Scenario e.g. "2040-el_eff"
+    carrier : str
+         Name of carrier (eg.: electricity)
     region : str
-        Region of time series; used for column 'region' in output
+        Region (eg. Adlershof
 
     Returns
     -------
-    ts_prepared : pd.DataFrame
-        Contains time series in the format of timeseries template.
+    demands : DataFrame
+        Dataframe with total yearly demand of electricity demand for a region.
+    demand_unit : str
+        Unit of total demands (eg. GWh)
 
     """
-    # copy data frame
-    time_series = ts_raw.copy()
+    demands = pd.DataFrame()
 
-    # extract one specific `year`
-    time_series = time_series[time_series.index.year == year]
+    sc_filtered = dp.filter_df(scalars, "type", "load")
+    sc_filtered = dp.filter_df(sc_filtered, "carrier", carrier)
+    sc_filtered = dp.filter_df(sc_filtered, "region", region)
+    sc_filtered = dp.filter_df(sc_filtered, "scenario_key", scenario)
+    if sc_filtered.empty or sc_filtered["var_value"].isna().all():
+        raise ValueError(
+            f"No scalar data found that matches "
+            f"scenario='{scenario}', "
+            f"carrier='{carrier}', "
+            f"region='{region}'"
+        )
 
-    # normalize with total electricity demand in year
-    time_series.iloc[:, 0] = time_series.iloc[:, 0] / time_series.iloc[:, 0].sum()
+    if not (sc_filtered["var_unit"].values[0] == sc_filtered["var_unit"].values).all():
+        raise ValueError(
+            f"Unit mismatch in scalar data of heat demands. "
+            f"Please make sure units match in {scalars}."
+        )
 
-    # bring time series to oemof-B3 format with `stack_timeseries()` and `format_header()`
-    ts_stacked = dp.stack_timeseries(time_series).rename(columns={"var_name": "region"})
-    ts_prepared = dp.format_header(
-        df=ts_stacked,
-        header=dp.HEADER_B3_TS,
-        index_name=config.settings.general.ts_index_name,
+    demand_unit = list(set(sc_filtered["var_unit"]))
+    demands[carrier] = sc_filtered["var_value"].values
+
+    return demands, demand_unit
+
+
     )
 
     # add additional information as required by template
