@@ -38,10 +38,21 @@ from oemof_b3.config import config
 from scripts.prepare_heat_demand import get_year, find_regional_files, get_shares_building_distribution
 
 
-def prepare_load_profile_time_series(ts_raw, year, region):
-    r"""
-    Prepares and formats time series of load for region 'B' and 'BB'.
-    The load profile is normalized with the total energy demand of a year.
+def prepare_electricity_load_data(load, year):
+    load = pd.read_csv(load, delimiter=",")
+    load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
+    load = load.rename(columns={"Zone 1 (kW)": "electricity_demand"})
+
+    # change format of datetime col to yyyy-mm-dd hh:mm:ss
+    load["datetime"] = pd.to_datetime(load["datetime"], format="%d-%m %H:%M")
+    load["datetime"] = load["datetime"].apply(lambda x: x.replace(year=year))
+    load = load.set_index(load["datetime"])
+    load = load.drop(["datetime"], axis=1)
+
+    # convert from kW to MW
+    load["electricity_demand"] = load["electricity_demand"] / 1000
+
+    return load
 
     Parameters
     ----------
