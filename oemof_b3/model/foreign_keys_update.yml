@@ -4,7 +4,7 @@
     'h2-export',
     'h2-import',
     'h2-shortage',
-    'electricity-bev_charging',
+#    'electricity-bev_charging',
     'electricity-curtailment',
     'electricity-demand',
     'electricity-export',
@@ -38,9 +38,9 @@
     'h2-boiler_large',
     'h2-boiler_small',
     'h2-gt',
-    'electricity-heatpump_river_large',
-    'electricity-heatpump_river_small',
-    'electricity-heatpump_geo_large',
+#    'electricity-heatpump_river_large',
+#    'electricity-heatpump_river_small',
+#    'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
     'electricity-pth',
 ]
@@ -50,7 +50,7 @@
 ]
 
 'efficiency': [
-    'electricity-heatpump_river_large',
-    'electricity-heatpump_geo_large',
+#    'electricity-heatpump_river_large',
+#    'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
 ]
