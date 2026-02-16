@@ -44,13 +44,14 @@ prepare_electricity_demand:
   var_name: electricity-demand-profile
 
 prepare_feedin:
-  years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019]
+  years: [2050]
   # specific to wind and pv time series
-  nuts_de30: DE30
-  rename_nuts: {DE30: B}
+  region: AD
   ts_var_unit: None
   ts_source: https://www.renewables.ninja/
   ts_comment: navigate to country Germany
+  nuts_de30: DE30
+  rename_nuts: { DE30: B }
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None
@@ -60,7 +61,7 @@ prepare_vehicle_charging_demand:
   home_end: "05:00"  # end charging strategy "balanced" for home profile
   work_start: "06:00"  # start charging strategy "balanced" for work profile
   work_end: "14:00"  # end charging strategy "balanced" for work profile
-  region_dict: {Berlin: B}
+  region_dict: {Adlershof: AD}
   var_name: electricity-bev_charging-profile
 
 process_re_potential:
