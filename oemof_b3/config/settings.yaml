@@ -39,12 +39,8 @@ prepare_cop_timeseries:
   scenario: ALL
 
 prepare_electricity_demand:
-  opsd_years: [2015, 2016, 2017, 2018, 2019]
-  regions: [B]
+  regions: [AD]
   ts_var_unit: None
-  ts_source: https://data.open-power-system-data.org/time_series/2020-10-06
-  ts_comment: DE_50hertz actual load data
-  col_select:  DE_50hertz_load_actual_entsoe_transparency
   var_name: electricity-demand-profile
 
 prepare_feedin:
