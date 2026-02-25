@@ -50,8 +50,8 @@ prepare_feedin:
   ts_var_unit: None
   ts_source: https://www.renewables.ninja/
   ts_comment: navigate to country Germany
-  nuts_de30: DE30
-  rename_nuts: { DE30: B }
+  pv_azimuth: '180'
+  rename_pv_azimuth: { '180': AD }
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None

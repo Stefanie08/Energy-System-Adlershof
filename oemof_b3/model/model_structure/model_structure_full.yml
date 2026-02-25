@@ -45,6 +45,5 @@ components:
   - heat_decentral-import
   - heat_decentral-export
   - heat_decentral-buffer_storage
-  - solar-pv
   - solar-pv_roof
   #- solar-pv_facade
