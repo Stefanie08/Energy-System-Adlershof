@@ -4,7 +4,7 @@
     'h2-export',
     'h2-import',
     'h2-shortage',
-#    'electricity-bev_charging',
+    'electricity-bev_charging',
     'electricity-curtailment',
     'electricity-demand',
     'electricity-export',
