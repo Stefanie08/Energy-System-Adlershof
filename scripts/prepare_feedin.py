@@ -101,16 +101,16 @@ if __name__ == "__main__":
     # prepare time series for each year
     for year in config.settings.prepare_feedin.years:
         # prepare wind time series
-        #wind_ts = prepare_wind_and_pv_time_series(
+        # wind_ts = prepare_wind_and_pv_time_series(
         #    filename_ts=filename_wind,
         #    year=year,
         #    type="wind-onshore",
-        #)
+        # )
 
         # TODO: prepare pv_facade time series with correct inclination angle
-        #pv_facade_ts = prepare_wind_and_pv_time_series(
+        # pv_facade_ts = prepare_wind_and_pv_time_series(
         #    filename_ts=filename_pv, year=year, type="solar-pv_facade"
-        #)
+        # )
 
         # prepare pv roof time series
         pv_roof_ts = prepare_wind_and_pv_time_series(
@@ -118,9 +118,7 @@ if __name__ == "__main__":
         )
 
         # add time series to `time_series_df`
-        time_series_df = pd.concat(
-            [time_series_df, pv_roof_ts], axis=0
-        )
+        time_series_df = pd.concat([time_series_df, pv_roof_ts], axis=0)
 
     # set index
     time_series_df.reset_index(drop=True, inplace=True)
