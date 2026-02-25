@@ -37,7 +37,7 @@ from oemof_b3.config import config
 
 def prepare_wind_and_pv_time_series(filename_ts, year, type):
     r"""
-    Prepares and formats time series of `type` 'wind' or 'pv' for region 'B' and 'BB'.
+    Prepares and formats time series of `type` 'wind' or 'pv' for region 'AD'.
 
     Parameters
     ----------
@@ -55,18 +55,18 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
 
     """
     # load raw time series and copy data frame
-    ts_raw = pd.read_csv(filename_ts, header=2, index_col=0, parse_dates=True)
+    ts_raw = pd.read_csv(filename_ts, index_col=0, parse_dates=True)
     time_series = ts_raw.copy()
 
     # extract one specific `year`
     time_series = time_series[time_series.index.year == year]
-    # get time series for B
+    # get time series for azimuth 180°
     time_series_regions = time_series.loc[
         :,
         [
-            config.settings.prepare_feedin.nuts_de30,
+            config.settings.prepare_feedin.pv_azimuth,
         ],
-    ].rename(columns=config.settings.prepare_feedin.rename_nuts)
+    ].rename(columns=config.settings.prepare_feedin.rename_pv_azimuth)
 
     # bring time series to oemof-B3 format with `stack_timeseries()` and `format_header()`
     ts_stacked = dp.stack_timeseries(time_series_regions).rename(
@@ -107,24 +107,19 @@ if __name__ == "__main__":
         #    type="wind-onshore",
         #)
 
-        # prepare pv time series
-        pv_ts = prepare_wind_and_pv_time_series(
-            filename_ts=filename_pv, year=year, type="solar-pv"
-        )
-
         # TODO: prepare pv_facade time series with correct inclination angle
         #pv_facade_ts = prepare_wind_and_pv_time_series(
         #    filename_ts=filename_pv, year=year, type="solar-pv_facade"
         #)
 
-        # TODO: prepare pv_roof time series with correct inclination angle
+        # prepare pv roof time series
         pv_roof_ts = prepare_wind_and_pv_time_series(
             filename_ts=filename_pv, year=year, type="solar-pv_roof"
         )
 
         # add time series to `time_series_df`
         time_series_df = pd.concat(
-            [time_series_df, pv_ts, pv_roof_ts], axis=0
+            [time_series_df, pv_roof_ts], axis=0
         )
 
     # set index
