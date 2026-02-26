@@ -1,11 +1,3 @@
-h2-demand:
-  carrier: h2
-  tech: demand
-  type: load
-  foreign_keys:
-    bus: h2
-    profile: h2-demand-profile
-
 h2-import:
   carrier: h2
   tech: import
@@ -14,15 +6,6 @@ h2-import:
     bus: h2
   defaults:
     output_parameters: "{}"
-
-h2-export:
-  carrier: h2
-  tech: export
-  type: excess
-  foreign_keys:
-    bus: h2
-  defaults:
-    input_parameters: "{}"
 
 h2-shortage:
   carrier: h2
@@ -215,15 +198,6 @@ heat_decentral-import:
     bus: heat_decentral
   defaults:
     output_parameters: "{}"
-
-heat_decentral-export:
-  carrier: heat_decentral
-  tech: export
-  type: excess
-  foreign_keys:
-    bus: heat_decentral
-  defaults:
-    input_parameters: "{}"
 
 h2-boiler_large:
   carrier: h2

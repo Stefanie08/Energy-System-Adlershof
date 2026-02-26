@@ -14,9 +14,7 @@ components:
   - h2-boiler_large
   - h2-boiler_small
   - h2-bpchp
-  - h2-demand
   - h2-excess
-  - h2-export
   - h2-gt
   - h2-import
   - h2-shortage
@@ -43,7 +41,6 @@ components:
   - heat_decentral-excess
   - heat_decentral-shortage
   - heat_decentral-import
-  - heat_decentral-export
   - heat_decentral-buffer_storage
   - solar-pv_roof
   #- solar-pv_facade
