@@ -1,7 +1,5 @@
 'bus': [
-    'h2-demand',
     'h2-excess',
-    'h2-export',
     'h2-import',
     'h2-shortage',
     'electricity-bev_charging',
@@ -19,7 +17,6 @@
     'heat_central-aquifer_storage',
     'heat_decentral-demand',
     'heat_decentral-import',
-    'heat_decentral-export',
     'heat_decentral-excess',
     'heat_decentral-shortage',
     'heat_decentral-buffer_storage',
@@ -27,7 +24,6 @@
 ]
 
 'profile': [
-    'h2-demand',
     'electricity-bev_charging',
     'heat_central-demand',
     'heat_decentral-demand',
