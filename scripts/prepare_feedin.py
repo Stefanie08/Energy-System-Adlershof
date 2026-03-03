@@ -35,18 +35,18 @@ import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
 
 
-def prepare_wind_and_pv_time_series(filename_ts, year, type):
+def prepare_pv_time_series(filename_ts, year, type):
     r"""
-    Prepares and formats time series of `type` 'wind' or 'pv' for region 'AD'.
+    Prepares and formats time series of `type` `pv roof` or 'pv facade' for region 'AD'.
 
     Parameters
     ----------
     filename_ts : str
-        Path including file name to wind and pv time series of renewables ninja for NUTS2 regions
+        Path including file name to pv time series of GSEE
     year : int
         Year for which time series is extracted from raw data in `filename_ts`
     type : str
-        Type of time series like 'wind' or 'pv'; used for column 'var_name' in output
+        Type of time series like 'solar-pv_roof'; used for column 'var_name' in output
 
     Returns
     -------
@@ -54,22 +54,41 @@ def prepare_wind_and_pv_time_series(filename_ts, year, type):
         Contains time series in the format of time series template of oemof-B3
 
     """
+    cfg = config.settings.prepare_feedin
+
     # load raw time series and copy data frame
     ts_raw = pd.read_csv(filename_ts, index_col=0, parse_dates=True)
     time_series = ts_raw.copy()
+    pv_feedin = pd.DataFrame(index=ts_raw.index)
+    total_feedin = pd.DataFrame(index=ts_raw.index)
 
     # extract one specific `year`
     time_series = time_series[time_series.index.year == year]
-    # get time series for azimuth 180°
+
     time_series_regions = time_series.loc[
         :,
-        [
-            config.settings.prepare_feedin.pv_azimuth,
-        ],
-    ].rename(columns=config.settings.prepare_feedin.rename_pv_azimuth)
+        config.settings.prepare_feedin.pv_azimuth,
+    ].rename(columns=cfg.rename_pv_azimuth)
+
+    # calculate the pv time series for each azimuth, normalize and
+    for col in time_series_regions.columns:
+        if col == "southeast":
+            pv_feedin[col] = (
+                time_series_regions[col] * cfg.se_sw_roof_area
+            ) / cfg.total_roof_area
+        elif col == "southwest":
+            pv_feedin[col] = (
+                time_series_regions[col] * cfg.se_sw_roof_area
+            ) / cfg.total_roof_area
+        elif col == "south":
+            pv_feedin[col] = (
+                time_series_regions[col] * (cfg.total_roof_area - cfg.efh_roof_area)
+            ) / cfg.total_roof_area
+
+    total_feedin[cfg.region] = pv_feedin.sum(axis=1)
 
     # bring time series to oemof-B3 format with `stack_timeseries()` and `format_header()`
-    ts_stacked = dp.stack_timeseries(time_series_regions).rename(
+    ts_stacked = dp.stack_timeseries(total_feedin).rename(
         columns={"var_name": "region"}
     )
     ts_prepared = dp.format_header(
@@ -108,12 +127,12 @@ if __name__ == "__main__":
         # )
 
         # TODO: prepare pv_facade time series with correct inclination angle
-        # pv_facade_ts = prepare_wind_and_pv_time_series(
+        # pv_facade_ts = prepare_pv_time_series(
         #    filename_ts=filename_pv, year=year, type="solar-pv_facade"
         # )
 
         # prepare pv roof time series
-        pv_roof_ts = prepare_wind_and_pv_time_series(
+        pv_roof_ts = prepare_pv_time_series(
             filename_ts=filename_pv, year=year, type="solar-pv_roof"
         )
 
