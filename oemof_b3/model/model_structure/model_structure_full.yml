@@ -23,8 +23,7 @@ components:
   - electricity-demand
   - electricity-export
 #  - electricity-heatpump_river_large #Fluss zen.
-#  - electricity-heatpump_geo_large #oberflächennah zen.
-#  - electricity-heatpump_river_small #Fluss dez.
+#  - electricity-heatpump_geo_large #mitteltiefe Geothermie zen.
   - electricity-heatpump_small # Außenluft
   - electricity-import
   - electricity-liion_battery #großbatterie
