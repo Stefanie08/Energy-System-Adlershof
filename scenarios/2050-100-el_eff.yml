@@ -7,7 +7,7 @@ name: 2050-100-el_eff
 label: 100 EL EFF
 
 datetimeindex:
-  start: "2019-01-01"
+  start: "2050-01-01"
   freq: "h"
   periods: 8760
 
@@ -36,8 +36,6 @@ filter_scalars:
       - "reduction_100"
 
 paths_timeseries:
-  - raw/time_series/ts_load_ch4.csv
-  #- raw/time_series/ts_load_h2.csv
   - results/_resources/ts_efficiency_heatpump_small.csv
   - results/_resources/ts_feedin.csv
   - results/_resources/ts_load_electricity.csv
@@ -49,4 +47,4 @@ filter_timeseries:
     - "2050-el_eff"
     - "ALL"
   timeindex_start:
-    "2017-01-01 00:00:00"
+    "2050-01-01 00:00:00"

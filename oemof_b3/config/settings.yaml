@@ -39,27 +39,25 @@ prepare_cop_timeseries:
   scenario: ALL
 
 prepare_electricity_demand:
-  opsd_years: [2015, 2016, 2017, 2018, 2019]
-  regions: [BB, B]
+  regions: [AD]
   ts_var_unit: None
-  ts_source: https://data.open-power-system-data.org/time_series/2020-10-06
-  ts_comment: DE_50hertz actual load data
-  col_select:  DE_50hertz_load_actual_entsoe_transparency
   var_name: electricity-demand-profile
 
 prepare_feedin:
-  years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019]
+  years: [2050]
   # specific to wind and pv time series
-  nuts_de30: DE30
-  nuts_de40: DE40
-  rename_nuts: {DE30: B, DE40: BB}
+  region: AD
   ts_var_unit: None
   ts_source: https://www.renewables.ninja/
   ts_comment: navigate to country Germany
-  # specific to ror time series
-  regions: [BB, B]
-  ts_source_ror: https://zenodo.org/record/1044463
-  ts_comment_ror: Isolated ror availability time series from DIW data
+  pv_azimuth: ['135', '180', '225']
+  rename_pv_azimuth: {
+    '135' : 'southeast',
+    '180' : 'south',
+    '225' : 'southwest', }
+  total_roof_area: 310125
+  efh_roof_area: 36372
+  se_sw_roof_area: 18186
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None
@@ -69,7 +67,7 @@ prepare_vehicle_charging_demand:
   home_end: "05:00"  # end charging strategy "balanced" for home profile
   work_start: "06:00"  # start charging strategy "balanced" for work profile
   work_end: "14:00"  # end charging strategy "balanced" for work profile
-  region_dict: {Berlin: B, Brandenburg: BB }
+  region_dict: {Adlershof: AD}
   var_name: electricity-bev_charging-profile
 
 process_re_potential:

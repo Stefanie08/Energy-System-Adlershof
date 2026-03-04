@@ -20,17 +20,17 @@ rule prepare_conv_pp:
 rule prepare_feedin:
     input:
         wind_feedin="raw/time_series/ninja_wind_country_DE_current_merra-2_nuts-2_corrected.csv",
-        pv_feedin="raw/time_series/ninja_pv_country_DE_merra-2_nuts-2_corrected.csv",
-        ror_feedin="raw/time_series/DIW_Hydro_availability.csv",
+        pv_feedin="raw/time_series/pv_feed_in_try_mean_rcp85_p3.csv",
     output: "results/_resources/ts_feedin.csv"
-    shell: "python scripts/prepare_feedin.py {input.wind_feedin} {input.pv_feedin} {input.ror_feedin} {output}"
+    shell: "python scripts/prepare_feedin.py {input.wind_feedin} {input.pv_feedin} {output}"
 
 rule prepare_electricity_demand:
     input:
-        opsd_url=HTTP.remote("https://data.open-power-system-data.org/time_series/2020-10-06/time_series_60min_singleindex.csv",
-                            keep_local=True),
+        electricity_load="raw/electricity_load",
+        scalars="raw/scalars/demands.csv",
+        distribution_buildings="raw/distribution_households.csv",
     output: "results/_resources/ts_load_electricity.csv"
-    shell: "python scripts/prepare_electricity_demand.py {input.opsd_url} {output}"
+    shell: "python scripts/prepare_electricity_demand.py {input.electricity_load} {input.scalars} {input.distribution_buildings} {output}"
 
 rule prepare_vehicle_charging_demand:
     input:
@@ -59,17 +59,15 @@ rule prepare_cop_timeseries:
 
 rule prepare_heat_demand:
     input:
-        weather="raw/weatherdata",
-        distribution_hh="raw/distribution_households.csv",
-        holidays="raw/holidays.csv",
-        building_class="raw/building_class.csv",
+        heat_load="raw/heat_load",
+        distribution_buildings="raw/distribution_households.csv",
         scalars="raw/scalars/demands.csv",
     output:
         scalars="results/_resources/scal_load_heat.csv",
         timeseries="results/_resources/ts_load_heat.csv",
     params:
         logfile="results/_resources/load_heat.log"
-    shell: "python scripts/prepare_heat_demand.py {input.weather} {input.distribution_hh} {input.holidays} {input.building_class} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
+    shell: "python scripts/prepare_heat_demand.py {input.heat_load} {input.distribution_buildings} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
 
 rule prepare_re_potential:
     input:
