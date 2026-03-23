@@ -22,8 +22,8 @@ components:
   - electricity-curtailment
   - electricity-demand
   - electricity-export
-#  - electricity-heatpump_river_large #Fluss zen.
-#  - electricity-heatpump_geo_large #mitteltiefe Geothermie zen.
+  - electricity-heatpump_river_large #Fluss zen.
+  - electricity-heatpump_geo_large #mitteltiefe Geothermie zen.
   - electricity-heatpump_small # Außenluft
   - electricity-import
   - electricity-liion_battery #großbatterie
@@ -39,7 +39,6 @@ components:
   - heat_decentral-demand
   - heat_decentral-excess
   - heat_decentral-shortage
-  - heat_decentral-import
   - heat_decentral-buffer_storage
   - solar-pv_roof
   #- solar-pv_facade

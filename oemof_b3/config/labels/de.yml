@@ -19,9 +19,8 @@ electricity-curtailment: Abregelung
 electricity-demand: Strombedarf
 electricity-export: Stromexport
 electricity-heatpump_river_large: Flusswasserwärmepumpe
-electricity-heatpump_geo_large: oberflächennahe Geothermie
-electricity-heatpump_river_small: Flusswasserwärmepumpe (dezentral)
-electricity-heatpump_small: Wärmepumpe (Haushalte)
+electricity-heatpump_geo_large: Mitteltiefe Geothermie
+electricity-heatpump_small: Wärmepumpe (Luft/Luft)
 electricity-import: Stromimport
 electricity-liion_battery: Großbatterie
 electricity-pth: res. PtH
