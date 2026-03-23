@@ -6,31 +6,32 @@ in_path1 : str
     ``raw/scalars/demands.csv``: path of scalar data as .csv
 in_path2 : str
     ``raw/weatherdata``: path of input directory with weather data
+in_path3 : str
+    path to river temperature timeseries directory
 out_path : str
-    ``results/_resources/ts_efficiency_heatpump_small.csv``: path of output file with timeseries
-    data as .csv
+    ``results/_resources/ts_heatpump.csv``: path of output file
 logfile : str
-    ``results/_resources/ts_efficiency_heatpump_small.log``: path to logfile
+    ``results/_resources/ts_heatpump.log``: path to logfile
 
 Outputs
 ---------
 pandas.DataFrame
-    with timeseries of cops of air-water heat pumps
+    with timeseries of COPs of air-source, river-source, and ground-source heat pumps
 
 Description
 -------------
-The script calculates cop timeseries of small-scale air-water heat pumps for decentralized use.
+The script calculates COP timeseries for three heat pump types:
+    - Air-water HP (small scale, decentralized)
+    - River-water HP (uses measured river temperature timeseries)
+    - Ground-source HP (uses constant temperature for mitteltiefe Geothermie)
 
-The quality grade `QUALITY_GRADE` of the air-source heat pump is assumed to be 0.4 according to:
-VDE ETG Energietechnik, VDE-Studie “Potenziale für Strom im Wärmemarkt bis 2050 - Wärmeversorgung
-in flexiblen Energieversorgungssystemen mit hohen Anteilen an erneuerbaren Energien”. 2015.
-(http://www.energiedialog2050.de/BASE/DOWNLOADS/VDE_ST_ETG_Warmemarkt_RZ-web.pdf)
+Quality grades per oemof-B3 settings.yaml:
+    - Air source:    0.40
+    - Water source:  0.50
+    - Ground source: 0.55
 
-The high temperature of the heat pump `temp_high` is assumed to be 50 °C
-According to the guidebooks of leading manufacturers, such as that of Buderus
-https://www.buderus.de/de/waermepumpe/vorlauftemperatur, a heat pump is operated efficiently up to
-a temperature of 50 °C. Furthermore, this value is close to the specification of the temperature
-of a modern radiator in the given guidebook.
+Sink temperature is assumed to be 50°C for air and ground source HPs,
+and 60°C for the river HP (central district heating).
 """
 
 import datetime
@@ -43,196 +44,168 @@ from oemof_b3 import model
 import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
 
+# Load quality grades for heatpump time series calculation
+QG_AIR_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_air_source
+QG_GROUND_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_ground_source
+QG_WATER_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_water_source
+
+# Constant ground temperature for mitteltiefe Geothermie
+# aus https://www.lfu.bayern.de/buerger/doc/uw_20_erdwaerme.pdf
+GROUND_TEMP = 20
+
+# Sink temperatures
+TEMP_HIGH_DECENTRAL = 50  # °C for air + ground source (decentralized)
+TEMP_HIGH_CENTRAL = 88  # °C for river HP (district heating / central)
+
+SCENARIO = config.settings.prepare_cop_timeseries.scenario
+
 
 def find_regional_files(path, region):
-    """
-    This function returns a list of file names in a directory that match the specified region.
-    It is a duplicate of the find_regional_files function in prepare_heat_demand.py
-    and hence could be moved to data_processing.py in future after some refactoring.
-
-    Parameters
-    ----------
-    path : str
-        Path to data
-
-    region : str
-        Region (eg. Brandenburg)
-
-    Returns
-    -------
-    files_region : list
-        List of file names matching region
-    """
     files_region = [file for file in os.listdir(path) if f"_{region}_" in file]
     files_region = sorted(files_region)
-
     if not files_region:
         raise FileNotFoundError(
             f"No data of region {region} could be found in directory: {path}."
         )
-
     return files_region
 
 
 def get_year(file_name):
-    """
-    This function returns a year from file name
-    It is a duplicate of the get_year function in prepare_heat_demand.py
-    and hence could be moved to data_processing.py in future after some refactoring.
-
-    Parameters
-    ----------
-    file_name : str
-        Name of file with year in it
-
-    Returns
-    -------
-    year : int
-        Year
-    """
-    # Add array with years to be searched for in file name
     years_search_array = np.arange(1990, 2051)
-    newline = "\n"
-
-    year_in_file = [
-        year_searched
-        for year_searched in years_search_array
-        if str(year_searched) in file_name
-    ]
+    year_in_file = [y for y in years_search_array if str(y) in file_name]
     if len(year_in_file) == 1:
-        year = year_in_file[0]
+        return year_in_file[0]
     else:
         raise ValueError(
-            f"Your file {file_name} is missing a year or has multiple years "
-            f"in its name." + newline + "Please provide data for a single year "
-            "with that year in the file name."
+            f"Your file {file_name} is missing a year or has multiple years in its name."
         )
-
-    return year
 
 
 def calc_cops(temp_high, temp_low, quality_grade):
     """
-    This function is based on the calc_cops function in the module
-    compression_heatpumps_and_chillers.py of oemof.thermal
-    https://github.com/oemof/oemof-thermal.
+    Carnot-based COP calculation.
 
-    It calculates the Coefficient of Performance (COP) of heat pumps
-    based on the Carnot efficiency (ideal process) and a scale-down factor.
-
-     Parameters
+    Parameters
     ----------
-    temp_high : list or pandas.Series of numerical values
-        Temperature of the high temperature reservoir in degrees Celsius
-    temp_low : list or pandas.Series of numerical values
-        Temperature of the low temperature reservoir in degrees Celsius
-    quality_grade : numerical value
-        Factor that scales down the efficiency of the real heat pump
-        (or chiller) process from the ideal process (Carnot efficiency), where
-         a factor of 1 means teh real process is equal to the ideal one.
+    temp_high : list or pd.Series
+        Sink temperature in °C
+    temp_low : list or pd.Series
+        Source temperature in °C
+    quality_grade : float
+        Scale-down factor from ideal Carnot process
 
     Returns
     -------
-    cops : list of numerical values
-        List of Coefficients of Performance (COPs)
+    list of COP values
     """
-    # Check if input arguments have proper type and length
     if not isinstance(temp_low, (list, pd.Series)):
         raise TypeError("Argument 'temp_low' is not of type list or pd.Series!")
-
     if not isinstance(temp_high, (list, pd.Series)):
-        raise TypeError("Argument 'temp_high' is not of " "type list or pd.Series!")
-
+        raise TypeError("Argument 'temp_high' is not of type list or pd.Series!")
     if len(temp_high) != len(temp_low):
-        if (len(temp_high) != 1) and ((len(temp_low) != 1)):
+        if (len(temp_high) != 1) and (len(temp_low) != 1):
             raise IndexError(
-                "Arguments 'temp_low' and 'temp_high' "
-                "have to be of same length or one has "
-                "to be of length 1 !"
+                "Arguments 'temp_low' and 'temp_high' must be same length "
+                "or one must have length 1!"
             )
 
-    # Make temp_low and temp_high have the same length and
-    # convert unit to Kelvin.
     length = max([len(temp_high), len(temp_low)])
-    if len(temp_high) == 1:
-        list_temp_high_K = [temp_high[0] + 273.15] * length
-    elif len(temp_high) == length:
-        list_temp_high_K = [t + 273.15 for t in temp_high]
-    if len(temp_low) == 1:
-        list_temp_low_K = [temp_low[0] + 273.15] * length
-    elif len(temp_low) == length:
-        list_temp_low_K = [t + 273.15 for t in temp_low]
+    list_temp_high_K = (
+        [temp_high[0] + 273.15] * length
+        if len(temp_high) == 1
+        else [t + 273.15 for t in temp_high]
+    )
+    list_temp_low_K = (
+        [temp_low[0] + 273.15] * length
+        if len(temp_low) == 1
+        else [t + 273.15 for t in temp_low]
+    )
 
     cops = [
         quality_grade * t_h / (t_h - t_l)
         for t_h, t_l in zip(list_temp_high_K, list_temp_low_K)
     ]
-
     return cops
 
 
+def load_river_temp(path, year):
+    """
+    Load and preprocess river temperature timeseries for a given year.
+
+    Parameters
+    ----------
+    path : str
+        Path to directory containing river temperature CSV files
+    year : int
+        Year to load
+
+    Returns
+    -------
+    pd.Series
+        Hourly river temperature in °C indexed by datetime
+    """
+    # Find the file matching the year
+    files = [f for f in os.listdir(path) if str(year) in f and f.endswith(".csv")]
+    if not files:
+        raise FileNotFoundError(
+            f"No river temperature file found for year {year} in {path}."
+        )
+
+    filepath = os.path.join(path, files[0])
+    data = pd.read_csv(filepath, sep=",", decimal=".", index_col=0)
+
+    return data["water_temperature"]
+
+
 if __name__ == "__main__":
-    in_path1 = sys.argv[1]  # path to csv with b3 demands
-    in_path2 = sys.argv[2]  # path to weather data
-    out_path = sys.argv[3]  # path to timeseries of cops of small-scale heat pumps
+    in_path1 = sys.argv[1]
+    in_path2 = sys.argv[2]
+    in_path3 = sys.argv[3]
+    out_path = sys.argv[4]
 
     logger = config.add_snake_logger("prepare_cop_timeseries")
 
-    # Get constants
-    # Quality grade of an air/water heat pump
-    QUALITY_GRADE = config.settings.prepare_cop_timeseries.quality_grade
-    # Set Scenario to "ALL" because the COP is independent of the scenarios
-    SCENARIO = config.settings.prepare_cop_timeseries.scenario
-
-    # Read scalar demand
+    # Read scalar demand and get regions
     sc = dp.load_b3_scalars(in_path1)
-
-    # Filter sc for heat demand
-    sc_filtered = dp.filter_df(sc, "carrier", "heat_decentral")
-
-    # Get regions from heat demand
+    sc_filtered = dp.filter_df(sc, "carrier", ["heat_decentral", "heat_central"])
     regions = sc_filtered.loc[:, "region"].unique()
 
-    # Get name of the efficiency profile from file component_attrs_update
+    # Get efficiency column names from component_attrs_update.yml
     component_attrs_update = load_yaml(
         os.path.join(model.here, "component_attrs_update.yml")
     )
-    eff_col_name = component_attrs_update["electricity-heatpump_small"]["foreign_keys"][
-        "efficiency"
-    ]
+    eff_col_name_air = component_attrs_update["electricity-heatpump_small"][
+        "foreign_keys"
+    ]["efficiency"]
+    eff_col_name_river = component_attrs_update["electricity-heatpump_river_large"][
+        "foreign_keys"
+    ]["efficiency"]
+    eff_col_name_ground = component_attrs_update["electricity-heatpump_geo_large"][
+        "foreign_keys"
+    ]["efficiency"]
 
-    # Create empty data frame for results / output
+    # create empty data frame for results / output
     final_cops = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     for region in regions:
         weather_file_names = find_regional_files(in_path2, region)
 
         for weather_file_name in weather_file_names:
-            # Read year from weather file name
             year = get_year(weather_file_name)
 
-            # Read temperature from weather data
+            # read weather data
             path_weather_data = os.path.join(in_path2, weather_file_name)
             temperature = pd.read_csv(
                 path_weather_data,
-                usecols=["temp_air", "precipitable_water"],
+                usecols=["temp_air"],
                 header=0,
             )
 
-            # Sink temperature: Surface + warm water heating
-            temp_high = [50]
-            # Source temperature: Ambient temperature
-            temp_low = temperature["temp_air"]
-
-            cops = pd.DataFrame(
-                index=pd.date_range(
-                    datetime.datetime(year, 1, 1, 0),
-                    periods=len(temperature),
-                    freq="h",
-                )
+            date_index = pd.date_range(
+                datetime.datetime(year, 1, 1, 0),
+                periods=len(temperature),
+                freq="h",
             )
-
-            cops[eff_col_name] = calc_cops(temp_high, temp_low, QUALITY_GRADE)
 
             cops_ts_info = {
                 "region": region,
@@ -240,10 +213,61 @@ if __name__ == "__main__":
                 "var_unit": ["-"],
             }
 
-            cops = dp.prepare_b3_timeseries(cops, **cops_ts_info)
+            # prepare air source heatpump time series
+            cops_air = pd.DataFrame(index=date_index)
+            cops_air[eff_col_name_air] = calc_cops(
+                temp_high=[TEMP_HIGH_DECENTRAL],
+                temp_low=temperature["temp_air"],
+                quality_grade=QG_AIR_SOURCE,
+            )
+            cops_air = dp.prepare_b3_timeseries(cops_air, **cops_ts_info)
+            final_cops = pd.concat(
+                [final_cops, cops_air], ignore_index=True, sort=False
+            )
 
-            # Append stacked cop of year to stacked time series with final cops
-            final_cops = pd.concat([final_cops, cops], ignore_index=True, sort=False)
+            # prepare river heatpump time series
+            try:
+                river_temp = load_river_temp(in_path3, year)
+
+                # calculate COP
+                cop_values = calc_cops(
+                    temp_high=[TEMP_HIGH_CENTRAL],
+                    temp_low=river_temp,
+                    quality_grade=QG_WATER_SOURCE,
+                )
+
+                cops_river = pd.DataFrame(index=date_index)
+                cops_river[eff_col_name_river] = cop_values
+
+                # set COP to 0 where river temperature is below 8°C (HP is off)
+                cops_river.loc[river_temp.values < 8, eff_col_name_river] = 0
+
+                n_off = (river_temp < 8).sum()
+                logger.info(
+                    f"River Heatpump offline for {n_off} hours ({n_off / 8760 * 100:.1f}%) due to temp < 8°C"
+                )
+
+                cops_river = dp.prepare_b3_timeseries(cops_river, **cops_ts_info)
+                final_cops = pd.concat(
+                    [final_cops, cops_river], ignore_index=True, sort=False
+                )
+
+            except FileNotFoundError as e:
+                logger.warning(f"River temperature data not found for year {year}: {e}")
+
+            # prepare GSHP time series
+            ground_temp_series = pd.Series(GROUND_TEMP, index=date_index)
+
+            cops_ground = pd.DataFrame(index=date_index)
+            cops_ground[eff_col_name_ground] = calc_cops(
+                temp_high=[TEMP_HIGH_CENTRAL],
+                temp_low=ground_temp_series,
+                quality_grade=QG_GROUND_SOURCE,
+            )
+            cops_ground = dp.prepare_b3_timeseries(cops_ground, **cops_ts_info)
+            final_cops = pd.concat(
+                [final_cops, cops_ground], ignore_index=True, sort=False
+            )
 
     # Rearrange stacked time series
     final_cops = dp.format_header(
