@@ -72,6 +72,7 @@ prepare_vehicle_charging_demand:
   work_end: "14:00"  # end charging strategy "balanced" for work profile
   region_dict: {Adlershof: AD}
   var_name: electricity-bev_charging-profile
+  rescaling_factor: 0.000150594
 
 process_re_potential:
   var_unit: MW
