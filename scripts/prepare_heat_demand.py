@@ -149,34 +149,6 @@ def get_year(file_name):
     return year
 
 
-def get_building_class(region, path_building_class):
-    """
-    This function reads building classes of German states from input path
-    and returns the building class of given region
-
-    Parameters
-    ----------
-    region : str
-        Region (eg. Brandenburg)
-    path_building_class : str
-        Input path
-
-    Returns
-    -------
-    building_class : str
-         Building class (German: Baualtersklasse) can assume values in range 1-11
-         eg. 5 in case of BB and 3 in case of B
-    """
-    # Read all national holidays per state
-    all_building_classes = pd.read_csv(path_building_class)
-    building_class_df = all_building_classes.loc[
-        all_building_classes["region"] == region
-    ]
-    building_class = building_class_df["building_class"].values[0]
-
-    return building_class
-
-
 def check_central_decentral(demands, value, consumer, carrier):
     """
     This function adds yearly demands per consumer and carrier to existing column
@@ -274,10 +246,10 @@ def get_heat_demand(scalars, scenario, carrier, region):
     return demands, demand_unit
 
 
-def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
+def calculate_heat_load(sector, carrier, heat_load, yearly_demands):
     """
     This function calculates a heat load profile of a consumer
-    (eg.: ghd, sfh, mfh) using heat_load data and building distribution shares.
+    (eg.: ghd, sfh, mfh) using heat_load data.
 
     Parameters
     ----------
@@ -289,8 +261,6 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
          DataFrame of heat load profile
     yearly_demands: DataFrame
          DataFrame with yearly demands per consumer
-    shares : dict[str, float]
-        Mapping from building type share (eg.: 'ghd','sfh')
 
     Returns
     -------
@@ -309,32 +279,29 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands, shares):
     if carrier == "heat_decentral":
         if sector == "sfh":
             heat_load_sector[f"sfh_{carrier}"] = (
-                heat_load["heat_demand"]
-                * shares[sector]
-                * yearly_demands["hh" + "_" + carrier][0]
+                heat_load["heat_demand"] * yearly_demands["hh" + "_" + carrier][0]
+            )
+        elif sector == "mfh":
+            heat_load_sector[f"mfh_{carrier}"] = (
+                heat_load["heat_demand"] * yearly_demands["hh" + "_" + carrier][0]
             )
         else:
             return pd.DataFrame()
 
     elif carrier == "heat_central":
-        if sector == "sfh":
+        if sector in ["sfh", "mfh"]:
             return pd.DataFrame()
-        if sector in ["ghd", "office", "lab", "uni"]:
+        elif sector in ["ghd", "office", "lab"]:
             heat_load_sector[f"{sector}_{carrier}"] = (
-                heat_load["heat_demand"]
-                * yearly_demands[sector + "_" + carrier][0]
-                * shares[sector]
+                heat_load["heat_demand"] * yearly_demands[sector + "_" + carrier][0]
             )
-        elif sector == "mfh":
-            heat_load_sector[f"mfh_{carrier}"] = (
-                heat_load["heat_demand"]
-                * shares[sector]
-                * yearly_demands["hh" + "_" + carrier][0]
+        else:
+            raise ValueError(
+                f"Sector '{sector}' not recognized. Please check the demand file name."
             )
+
     else:
-        raise ValueError(
-            f"Sector '{sector}' not recognized. Please check the demand file name."
-        )
+        raise ValueError(f"Carrier '{carrier}' not recognized.")
 
     return heat_load_sector
 
@@ -359,18 +326,17 @@ def prepare_heat_load_data(load, year):
 
 
 if __name__ == "__main__":
-    in_path1 = sys.argv[1]  # path to heat load data
-    in_path2 = sys.argv[2]  # path to building distributions data
-    in_path3 = sys.argv[3]  # path to csv with b3 scalars
-    out_path1 = sys.argv[4]
-    out_path2 = sys.argv[5]
+    in_path1 = sys.argv[1]  # path to weather data
+    in_path2 = sys.argv[2]  # path to csv with b3 scalars
+    out_path1 = sys.argv[3]
+    out_path2 = sys.argv[4]
 
     logger = config.add_snake_logger("prepare_heat_demand")
 
     CARRIERS = ["heat_central", "heat_decentral"]
 
     # Read state heat demands of ghd and hh sectors
-    sc = dp.load_b3_scalars(in_path3)
+    sc = dp.load_b3_scalars(in_path2)
 
     # filter for heat demand data
     sc_filtered = dp.filter_df(sc, "type", "load")
@@ -392,8 +358,6 @@ if __name__ == "__main__":
     )
 
     for region, scenario in itertools.product(regions, scenarios):
-        shares = get_shares_building_distribution(in_path2, region)
-
         demand_file_names = find_regional_files(in_path1, region)
 
         for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
@@ -425,7 +389,6 @@ if __name__ == "__main__":
                 carrier,
                 heat_load,
                 yearly_demands,
-                shares,
             )
 
             if heat_load_consumer.empty:
@@ -456,24 +419,27 @@ if __name__ == "__main__":
                 )
             )
 
-        # Change format of the decentral heat demand
-        if "sfh_heat_decentral" in heat_load_consumer_total:
+        # Sum up and format the decentral heat demand (sfh + mfh)
+        decentral_cols = [
+            c for c in heat_load_consumer_total if c.endswith("_heat_decentral")
+        ]
+        if decentral_cols:
             frames.append(
                 dp.prepare_b3_timeseries(
-                    heat_load_consumer_total[["sfh_heat_decentral"]].rename(
-                        columns={"sfh_heat_decentral": "heat_decentral-demand-profile"}
-                    ),
+                    heat_load_consumer_total[decentral_cols]
+                    .sum(axis=1)
+                    .to_frame("heat_decentral-demand-profile"),
                     **heat_load_ts_info,
                 )
             )
 
         total_heat_load = pd.concat([total_heat_load, *frames], ignore_index=True)
 
-    # Aggregate heat demand for different sectors (hh, ghd, i)
+    # Aggregate heat demand for different sectors
     demand_per_sector = dp.filter_df(
         sc,
         "tech",
-        ["demand_hh", "demand_ghd", "demand_office", "demand_lab", "demand_uni"],
+        ["demand_hh", "demand_ghd", "demand_office", "demand_lab"],  # "demand_uni"
     )
     aggregated_demands = dp.aggregate_scalars(
         demand_per_sector,

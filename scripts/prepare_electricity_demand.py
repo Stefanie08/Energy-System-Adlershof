@@ -61,7 +61,7 @@ def prepare_electricity_load_data(load, year):
     """
     load = pd.read_csv(load, delimiter=",")
     load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
-    load = load.rename(columns={"Zone 1 (kW)": "electricity_demand"})
+    load = load.rename(columns={"Strom gesamt (kW)": "electricity_demand"})
 
     # change format of datetime col to yyyy-mm-dd hh:mm:ss
     load["datetime"] = pd.to_datetime(load["datetime"], format="%d-%m %H:%M")
@@ -125,7 +125,7 @@ def get_electricity_demand(scalars, scenario, carrier, region):
     return demands, demand_unit
 
 
-def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carrier):
+def calc_electricity_load(electricity_load, yearly_demands, sector, carrier):
     """
     This function calculates the electricity load by multiplying
     the load profile with the share of the sector in the building distribution and the total
@@ -158,9 +158,7 @@ def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carr
     )
 
     electricity_load_sector[sector + "_" + carrier] = (
-        electricity_load["electricity_demand"]
-        * shares[sector]
-        * yearly_demands[carrier].values
+        electricity_load["electricity_demand"] * yearly_demands[carrier].values
     )
 
     return electricity_load_sector
@@ -169,8 +167,7 @@ def calc_electricity_load(electricity_load, shares, yearly_demands, sector, carr
 if __name__ == "__main__":
     electricity_ts_data = sys.argv[1]
     scalars = sys.argv[2]
-    building_share = sys.argv[3]
-    output_file = sys.argv[4]
+    output_file = sys.argv[3]
 
     # initialize data frame
     time_series_df = pd.DataFrame()
@@ -202,8 +199,6 @@ if __name__ == "__main__":
 
     # prepare time series for each year and region
     for region, scenario in itertools.product(regions, scenarios):
-        shares = get_shares_building_distribution(building_share, region)
-
         demand_file_names = find_regional_files(electricity_ts_data, region)
 
         for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
@@ -231,7 +226,7 @@ if __name__ == "__main__":
 
             # calculate the electricity load for the sector
             electricity_load = calc_electricity_load(
-                electricity_load_data, shares, yearly_demands, sector, carrier
+                electricity_load_data, yearly_demands, sector, carrier
             )
 
             ex_df[sector + "_" + carrier] = (
