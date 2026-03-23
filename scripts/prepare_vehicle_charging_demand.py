@@ -149,6 +149,12 @@ def prepare_vehicle_charging_demand(input_dir, balanced=True, const_share=None):
             columns={"sum CS power": f"ts_{year}"}
         )
 
+        # rescale "sum CS power" profile fitting for area of Adlershof by factor 0.000150594
+        ts_total_demand = (
+            ts_total_demand
+            * config.settings.prepare_vehicle_charging_demand.rescaling_factor
+        )
+
         # divide by total electricity demand of vehicles
         ts_total_norm = ts_total_demand / ts_total_demand.sum()
 
