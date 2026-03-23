@@ -31,7 +31,7 @@ Quality grades per oemof-B3 settings.yaml:
     - Ground source: 0.55
 
 Sink temperature is assumed to be 50°C for air and ground source HPs,
-and 60°C for the river HP (central district heating).
+and 88°C for the river HP (central district heating).
 """
 
 import datetime
@@ -51,7 +51,7 @@ QG_WATER_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_water_sou
 
 # Constant ground temperature for mitteltiefe Geothermie
 # aus https://www.lfu.bayern.de/buerger/doc/uw_20_erdwaerme.pdf
-GROUND_TEMP = 20
+GROUND_TEMP = config.settings.prepare_cop_timeseries.ground_source_temperature
 
 # Sink temperatures
 TEMP_HIGH_DECENTRAL = 50  # °C for air + ground source (decentralized)
