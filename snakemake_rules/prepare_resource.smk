@@ -28,9 +28,8 @@ rule prepare_electricity_demand:
     input:
         electricity_load="raw/electricity_load",
         scalars="raw/scalars/demands.csv",
-        distribution_buildings="raw/distribution_households.csv",
     output: "results/_resources/ts_load_electricity.csv"
-    shell: "python scripts/prepare_electricity_demand.py {input.electricity_load} {input.scalars} {input.distribution_buildings} {output}"
+    shell: "python scripts/prepare_electricity_demand.py {input.electricity_load} {input.scalars} {output}"
 
 rule prepare_vehicle_charging_demand:
     input:
@@ -50,24 +49,24 @@ rule prepare_scalars:
 rule prepare_cop_timeseries:
     input:
         scalars="raw/scalars/demands.csv",
-        weather="raw/weatherdata"
+        weather="raw/weatherdata",
+        river="raw/river_data",
     output:
         ts_efficiency_small="results/_resources/ts_efficiency_heatpump_small.csv",
     params:
         logfile="results/_resources/ts_efficiency_heatpump_small.log"
-    shell: "python scripts/prepare_cop_timeseries.py {input.scalars} {input.weather} {output.ts_efficiency_small} {params.logfile}"
+    shell: "python scripts/prepare_cop_timeseries.py {input.scalars} {input.weather} {input.river} {output.ts_efficiency_small} {params.logfile}"
 
 rule prepare_heat_demand:
     input:
         heat_load="raw/heat_load",
-        distribution_buildings="raw/distribution_households.csv",
         scalars="raw/scalars/demands.csv",
     output:
         scalars="results/_resources/scal_load_heat.csv",
         timeseries="results/_resources/ts_load_heat.csv",
     params:
         logfile="results/_resources/load_heat.log"
-    shell: "python scripts/prepare_heat_demand.py {input.heat_load} {input.distribution_buildings} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
+    shell: "python scripts/prepare_heat_demand.py {input.heat_load} {input.scalars} {output.scalars} {output.timeseries} {params.logfile}"
 
 rule prepare_re_potential:
     input:
