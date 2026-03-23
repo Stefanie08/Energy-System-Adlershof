@@ -35,7 +35,10 @@ plot_scalar_results:
   tick_label_size: 12
 
 prepare_cop_timeseries:
-  quality_grade: 0.4
+  quality_grade_air_source: 0.4
+  quality_grade_water_source: 0.5
+  quality_grade_ground_source: 0.55
+  ground_source_temperature: 20
   scenario: ALL
 
 prepare_electricity_demand:
