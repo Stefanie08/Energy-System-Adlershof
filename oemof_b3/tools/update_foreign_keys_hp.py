@@ -49,7 +49,6 @@ def update_foreign_keys_hp():
 
     updates_dict = {
         "data/elements/electricity-heatpump_river_large.csv": "electricity-heatpump_river_large_profile",
-        "data/elements/electricity-heatpump_river_small.csv": "electricity-heatpump_river_small_profile",
         "data/elements/electricity-heatpump_geo_large.csv": "electricity-heatpump_geo_large_profile",
         "data/elements/electricity-heatpump_small.csv": "electricity-heatpump_small_profile",
     }

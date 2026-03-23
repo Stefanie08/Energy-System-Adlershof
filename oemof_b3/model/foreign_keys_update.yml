@@ -34,8 +34,8 @@
     'h2-boiler_large',
     'h2-boiler_small',
     'h2-gt',
-#    'electricity-heatpump_river_large',
-#    'electricity-heatpump_geo_large',
+    'electricity-heatpump_river_large',
+    'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
     'electricity-pth',
 ]
@@ -45,7 +45,7 @@
 ]
 
 'efficiency': [
-#    'electricity-heatpump_river_large',
-#    'electricity-heatpump_geo_large',
+    'electricity-heatpump_river_large',
+    'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
 ]
