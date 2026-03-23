@@ -190,15 +190,6 @@ heat_decentral-buffer_storage:
     input_parameters: "{}"
     output_parameters: "{}"
 
-heat_decentral-import:
-  carrier: heat_decentral
-  tech: import
-  type: shortage
-  foreign_keys:
-    bus: heat_decentral
-  defaults:
-    output_parameters: "{}"
-
 h2-boiler_large:
   carrier: h2
   tech: boiler_large
