@@ -513,8 +513,8 @@ if __name__ == "__main__":
     logger = config.add_snake_logger("plot_scalar_results")
 
     # User input
-    CARRIERS = ["electricity", "heat_central", "heat_decentral", "h2", "ch4"]
-    CARRIERS_WO_CH4 = ["electricity", "heat_central", "heat_decentral", "h2"]
+    CARRIERS = ["electricity", "heat_central", "heat_decentral", "gas", "ch4"]
+    CARRIERS_WO_CH4 = ["electricity", "heat_central", "heat_decentral", "gas"]
 
     # create the directory plotted where all plots are saved
     if not os.path.exists(target):

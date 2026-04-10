@@ -5,19 +5,19 @@ links:
 
 
 busses:
-  - h2
+  - gas
   - electricity
   - heat_central
   - heat_decentral
 
 components:
-  - h2-boiler_large
-  - h2-boiler_small
-  - h2-bpchp
-  - h2-excess
-  - h2-gt
-  - h2-import
-  - h2-shortage
+  - gas-boiler_large
+  - gas-boiler_small
+  - gas-bpchp
+  - gas-excess
+  - gas-gt
+  - gas-import
+  - gas-shortage
   - electricity-bev_charging
   - electricity-curtailment
   - electricity-demand

@@ -1,27 +1,27 @@
-h2-import:
-  carrier: h2
+gas-import:
+  carrier: gas
   tech: import
   type: shortage
   foreign_keys:
-    bus: h2
+    bus: gas
   defaults:
     output_parameters: "{}"
 
-h2-shortage:
-  carrier: h2
+gas-shortage:
+  carrier: gas
   tech: shortage
   type: shortage
   foreign_keys:
-    bus: h2
+    bus: gas
   defaults:
     output_parameters: "{}"
 
-h2-excess:
-  carrier: h2
+gas-excess:
+  carrier: gas
   tech: excess
   type: excess
   foreign_keys:
-    bus: h2
+    bus: gas
   defaults:
     marginal_cost: 0
     input_parameters: "{}"
@@ -45,17 +45,6 @@ electricity-heatpump_river_large:
     from_bus: electricity
     to_bus: heat_central
     efficiency: electricity-heatpump_river_large-profile
-  defaults:
-    output_parameters: "{}"
-
-electricity-heatpump_river_small:
-  carrier: electricity
-  tech: heatpump_river_small
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: heat_decentral
-    efficiency: electricity-heatpump_river_small-profile
   defaults:
     output_parameters: "{}"
 
@@ -190,41 +179,41 @@ heat_decentral-buffer_storage:
     input_parameters: "{}"
     output_parameters: "{}"
 
-h2-boiler_large:
-  carrier: h2
+gas-boiler_large:
+  carrier: gas
   tech: boiler_large
   type: conversion
   foreign_keys:
-    from_bus: h2
+    from_bus: gas
     to_bus: heat_central
   defaults:
     output_parameters: "{}"
 
-h2-boiler_small:
-  carrier: h2
+gas-boiler_small:
+  carrier: gas
   tech: boiler_small
   type: conversion
   foreign_keys:
-    from_bus: h2
+    from_bus: gas
     to_bus: heat_decentral
   defaults:
     output_parameters: "{}"
 
-h2-bpchp:
-  carrier: h2
+gas-bpchp:
+  carrier: gas
   tech: bpchp
   type: backpressure
   foreign_keys:
-    fuel_bus: h2
+    fuel_bus: gas
     electricity_bus: electricity
     heat_bus: heat_central
 
-h2-gt:
-  carrier: h2
+gas-gt:
+  carrier: gas
   tech: gt
   type: conversion
   foreign_keys:
-    from_bus: h2
+    from_bus: gas
     to_bus: heat_central
   defaults:
     output_parameters: "{}"
