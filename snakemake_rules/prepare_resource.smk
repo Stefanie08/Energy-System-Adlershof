@@ -26,7 +26,7 @@ rule prepare_feedin:
 
 rule prepare_electricity_demand:
     input:
-        electricity_load="raw/electricity_load",
+        electricity_load="raw/energy_load",
         scalars="raw/scalars/demands.csv",
     output: "results/_resources/ts_load_electricity.csv"
     shell: "python scripts/prepare_electricity_demand.py {input.electricity_load} {input.scalars} {output}"
@@ -59,7 +59,7 @@ rule prepare_cop_timeseries:
 
 rule prepare_heat_demand:
     input:
-        heat_load="raw/heat_load",
+        heat_load="raw/energy_load",
         scalars="raw/scalars/demands.csv",
     output:
         scalars="results/_resources/scal_load_heat.csv",
