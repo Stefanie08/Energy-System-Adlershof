@@ -249,10 +249,10 @@ if __name__ == "__main__":
 
         if emission_limit is not None:
             constraints.emission_limit(m, limit=emission_limit)
-        if el_gas_relations is not None:
-            add_electricity_gas_relation_constraints(
-                model=m, relations=el_gas_relations
-            )
+        # if el_gas_relations is not None:
+        #    add_electricity_gas_relation_constraints(
+        #        model=m, relations=el_gas_relations
+        #    )
 
         # tell the model to get the dual variables when solving
         if config.settings.optimize.receive_duals:
