@@ -1,48 +1,42 @@
-# oil: Öl  Raises error as "oil" is in "boiler" -> duplicate mappings
-oil: Öl
-oil-gt: Öl GT
-biomass: Biomasse
-biomass-gt: Biomasse GT
-biomass-st: Biomasse DT
 gas: Gas
 gas-boiler_large: Gas Boiler (Groß)
 gas-boiler_small: Gas Boiler (Klein)
-gas-bpchp: Gas KWK (Gegendruck)
-gas-demand: Gas Bedarf
-gas-excess: Gas Überschuss
-gas-export: Gas Export
-gas-gt: Gas GT
-gas-import: Gas Import
-gas-shortage: Gas Shortage
+gas-bpchp: Gas BHKW
+gas-demand: Gasbedarf
+gas-excess: Gasüberschuss
+gas-export: Gasexport
+gas-gt: GT
+gas-import: Gasimport
+gas-shortage: Gas shortage
+
 electricity-bev_charging: BEV
 electricity-curtailment: Abregelung
 electricity-demand: Strombedarf
 electricity-export: Stromexport
-electricity-heatpump_river_large: WP Fluss
-electricity-heatpump_geo_large: WP Geothermie
-electricity-heatpump_small: Wärmepumpe (Luft/Luft)
+electricity-heatpump_river_large: WP (Fluss)
+electricity-heatpump_geo_large: WP (Mitteltiefe Geothermie)
+electricity-heatpump_small: WP (Außenluft)
 electricity-import: Stromimport
 electricity-liion_battery: Großbatterie
-electricity-pth: res. PtH
-electricity-shortage: Strom
-electricity-transmission: Stromübertragung
-hard coal: Steinkohle
+electricity-pth: resistive PtH
+electricity-shortage: Strom shortage
+
 heat_central-demand: zen. Wärmebedarf
 heat_central-excess: zen. Wärmeüberschuss
-heat_central-shortage: zen. Wärme Shortage
-heat_central-import: zen. Waermeimport
+heat_central-shortage: zen. Wärme shortage
+heat_central-import: zen. Wärmeimport
 heat_central-export: zen. Wärmeexport
 heat_central-district_heating_storage: Druckwärmespeicher
 heat_central-aquifer_storage: Aquiferwärmespeicher
+
 heat_decentral-demand: dez. Wärmebedarf
 heat_decentral-excess: dez. Wärmeüberschuss
-heat_decentral-shortage: dez. Wärme Shortage
+heat_decentral-shortage: dez. Wärme shortage
 heat_decentral-import: dez. Waermeimport
-heat_decentral-export: dez. Waermeexport
-heat_decentral-buffer_storage: dez. Pufferwärmespeicher
-lignite: Braunkohle
-nuclear-st: Kernkraftwerk
-other: Andere
-solar-pv: PV
+heat_decentral-buffer_storage: Pufferwärmespeicher
+
 solar-pv_roof: Dach-PV
 solar-pv_facade: Fassaden-PV
+wind-onshore: Kleinwindanlage
+
+other: Andere
