@@ -3,7 +3,6 @@
     'gas-import',
     'gas-shortage',
     'electricity-bev_charging',
-    'electricity-curtailment',
     'electricity-demand',
     'electricity-export',
     'electricity-import',
