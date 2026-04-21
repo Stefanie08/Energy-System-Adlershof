@@ -38,11 +38,13 @@ import datetime
 import os
 import sys
 import pandas as pd
-import numpy as np
+import oemof_b3.tools.data_processing as dp
+
 from oemof_b3.config.config import load_yaml
 from oemof_b3 import model
-import oemof_b3.tools.data_processing as dp
 from oemof_b3.config import config
+from scripts.prepare_heat_demand import find_regional_files, get_year
+
 
 # Load quality grades for heatpump time series calculation
 QG_AIR_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_air_source
@@ -58,27 +60,6 @@ TEMP_HIGH_DECENTRAL = 50  # °C for air + ground source (decentralized)
 TEMP_HIGH_CENTRAL = 88  # °C for river HP (district heating / central)
 
 SCENARIO = config.settings.prepare_cop_timeseries.scenario
-
-
-def find_regional_files(path, region):
-    files_region = [file for file in os.listdir(path) if f"_{region}_" in file]
-    files_region = sorted(files_region)
-    if not files_region:
-        raise FileNotFoundError(
-            f"No data of region {region} could be found in directory: {path}."
-        )
-    return files_region
-
-
-def get_year(file_name):
-    years_search_array = np.arange(1990, 2051)
-    year_in_file = [y for y in years_search_array if str(y) in file_name]
-    if len(year_in_file) == 1:
-        return year_in_file[0]
-    else:
-        raise ValueError(
-            f"Your file {file_name} is missing a year or has multiple years in its name."
-        )
 
 
 def calc_cops(temp_high, temp_low, quality_grade):
