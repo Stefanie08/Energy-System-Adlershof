@@ -169,6 +169,15 @@ heat_decentral-shortage:
   defaults:
     output_parameters: "{}"
 
+heat_decentral-import:
+  carrier: heat_decentral
+  tech: import
+  type: shortage
+  foreign_keys:
+    bus: heat_decentral
+  defaults:
+    output_parameters: "{}"
+
 heat_decentral-buffer_storage:
   carrier: heat_decentral
   tech: buffer_storage
@@ -207,16 +216,19 @@ gas-bpchp:
     fuel_bus: gas
     electricity_bus: electricity
     heat_bus: heat_central
+  defaults:
+    capacity_potential: +.inf
 
 gas-gt:
   carrier: gas
   tech: gt
-  type: conversion
+  type: backpressure
   foreign_keys:
-    from_bus: gas
-    to_bus: heat_central
+    fuel_bus: gas
+    electricity_bus: electricity
+    heat_bus: heat_central
   defaults:
-    output_parameters: "{}"
+    capacity_potential: +.inf #high value to avoid capacity constraint
 
 electricity-pth:
   carrier: electricity
