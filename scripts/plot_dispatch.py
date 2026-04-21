@@ -127,10 +127,11 @@ def plot_dispatch_data(df, df_demand, bus_name):
     timeframe = [
         (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
         (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
+        # (f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00"),
     ]
 
     for start_date, end_date in timeframe:
-        fig, ax = plt.subplots(figsize=(12, 5))
+        fig, ax = plt.subplots(figsize=(15, 5))
 
         # filter timeseries
         df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
