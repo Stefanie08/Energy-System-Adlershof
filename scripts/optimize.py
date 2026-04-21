@@ -232,7 +232,7 @@ if __name__ == "__main__":
             es,
             legend=True,
             filepath=r"/Users/diephangnguyen/Desktop/MA-Wetterdaten/Auswertung/dispatch/energy_system",
-            img_format="pdf"
+            img_format="pdf",
         )
         esgr.render()
 
