@@ -48,6 +48,7 @@ from oemof_b3.tools import data_processing as dp
 from oemof.solph.constraints.equate_flows import equate_flows_by_keyword
 from oemof_b3.config import config
 from oemof_b3.tools.timing import Timer
+from oemof.visio import ESGraphRenderer
 
 
 logger = logging.getLogger()
@@ -226,6 +227,14 @@ if __name__ == "__main__":
                 attributemap={},
                 typemap=TYPEMAP,
             )
+
+        esgr = ESGraphRenderer(
+            es,
+            legend=True,
+            filepath=r"/Users/diephangnguyen/Desktop/MA-Wetterdaten/Auswertung/dispatch/energy_system",
+            img_format="pdf"
+        )
+        esgr.render()
 
         # Reduce number of timestep for debugging
         if config.settings.optimize.debug:
