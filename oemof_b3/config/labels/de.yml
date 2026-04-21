@@ -5,7 +5,7 @@ gas-bpchp: Gas BHKW
 gas-demand: Gasbedarf
 gas-excess: Gasüberschuss
 gas-export: Gasexport
-gas-gt: GT
+gas-gt: Gasturbine
 gas-import: Gasimport
 gas-shortage: Gas shortage
 

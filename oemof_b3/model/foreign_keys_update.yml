@@ -33,7 +33,6 @@
 'from_to_bus': [
     'gas-boiler_large',
     'gas-boiler_small',
-    'gas-gt',
     'electricity-heatpump_river_large',
     'electricity-heatpump_geo_large',
     'electricity-heatpump_small',
@@ -42,6 +41,7 @@
 
 'chp': [
     'gas-bpchp',
+    'gas-gt',
 ]
 
 'efficiency': [
