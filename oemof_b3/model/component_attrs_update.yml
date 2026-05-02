@@ -269,3 +269,14 @@ solar-pv_facade:
   defaults:
     marginal_cost: 0
     output_parameters: "{}"
+
+solar-solarthermal:
+  carrier: solar
+  tech: solarthermal
+  type: volatile
+  foreign_keys:
+    bus: heat_decentral
+    profile: solar-solarthermal-profile
+  defaults:
+    marginal_cost: 0
+    output_parameters: "{}"

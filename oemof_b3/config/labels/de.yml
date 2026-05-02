@@ -37,6 +37,7 @@ heat_decentral-buffer_storage: Pufferwärmespeicher
 
 solar-pv_roof: Dach-PV
 solar-pv_facade: Fassaden-PV
+solar-solarthermal: Solarthermie
 wind-onshore: Kleinwindanlage
 
 other: Andere

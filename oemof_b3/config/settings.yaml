@@ -53,14 +53,9 @@ prepare_feedin:
   ts_var_unit: None
   ts_source: https://www.renewables.ninja/
   ts_comment: navigate to country Germany
-  pv_azimuth: ['135', '180', '225']
-  rename_pv_azimuth: {
-    '135' : 'southeast',
-    '180' : 'south',
-    '225' : 'southwest', }
   total_roof_area: 310125
   efh_roof_area: 36372
-  se_sw_roof_area: 18186
+  ghd_mfh_roof_area: 273753
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None

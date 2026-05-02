@@ -19,10 +19,11 @@ rule prepare_conv_pp:
 
 rule prepare_feedin:
     input:
-        wind_feedin="raw/time_series/ninja_wind_country_DE_current_merra-2_nuts-2_corrected.csv",
+        pv_facade_feedin="raw/time_series/pv_feedin_facade_try_mean_rcp85_p3.csv",
         pv_feedin="raw/time_series/pv_feed_in_try_mean_rcp85_p3.csv",
+        solarthermal_feedin="raw/time_series/solarthermal_feed_in_try_mean_rcp85_p3.csv",
     output: "results/_resources/ts_feedin.csv"
-    shell: "python scripts/prepare_feedin.py {input.wind_feedin} {input.pv_feedin} {output}"
+    shell: "python scripts/prepare_feedin.py {input.pv_facade_feedin} {input.pv_feedin} {input.solarthermal_feedin} {output}"
 
 rule prepare_electricity_demand:
     input:
