@@ -40,3 +40,5 @@ components:
   - heat_decentral-shortage
   - heat_decentral-buffer_storage
   - solar-pv_roof
+  - solar-pv_facade
+  - solar-solarthermal
