@@ -56,8 +56,8 @@ QG_WATER_SOURCE = config.settings.prepare_cop_timeseries.quality_grade_water_sou
 GROUND_TEMP = config.settings.prepare_cop_timeseries.ground_source_temperature
 
 # Sink temperatures
-TEMP_HIGH_DECENTRAL = 50  # °C for air + ground source (decentralized)
-TEMP_HIGH_CENTRAL = 88  # °C for river HP (district heating / central)
+TEMP_HIGH_DECENTRAL = 60  # °C for air
+TEMP_HIGH_CENTRAL = 88  # °C for river HP and geothermal HP
 
 SCENARIO = config.settings.prepare_cop_timeseries.scenario
 
