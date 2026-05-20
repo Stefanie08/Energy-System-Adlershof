@@ -40,7 +40,7 @@ def update_foreign_keys(datapackage_path, updates_dict, target_field):
 
 def update_foreign_keys_hp():
     # Parameters
-    scenario = "2050-100-el_eff"
+    scenario = "2050-100-greenfield"
     scenario_path = (
         Path(__file__).resolve().parents[2] / "results" / scenario / "preprocessed"
     )  # Path to your datapackage.json file

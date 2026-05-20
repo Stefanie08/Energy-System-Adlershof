@@ -3,8 +3,8 @@
 
 # build_datapackage
 
-name: 2050-100-el_eff
-label: 100 EL EFF
+name: 2050-greenfield
+label: Greenfield
 
 datetimeindex:
   start: "2050-01-01"
@@ -31,7 +31,7 @@ filter_scalars:
   1:
     scenario_key:
       - "ALL"
-      - "2050-el_eff"
+      - "2050-100-greenfield"
       - "2050-base"
       - "reduction_100"
 
@@ -44,7 +44,7 @@ paths_timeseries:
 
 filter_timeseries:
   scenario_key:
-    - "2050-el_eff"
+    - "2050-100-greenfield"
     - "ALL"
   timeindex_start:
     "2050-01-01 00:00:00"
