@@ -3,7 +3,7 @@ from pathlib import Path
 from oemof import solph
 from oemof.visio.energy_system_graph import ESGraphRenderer
 
-scenario = "2050-100-el_eff"
+scenario = "2050-greenfield"
 
 energysystem_path = (
     Path(__file__).resolve().parents[3]
