@@ -3,7 +3,7 @@
 
 # build_datapackage
 
-name: 2050-100-gas_moreCH4
+name: 2050-100-plus
 label: AD+
 
 datetimeindex:
@@ -31,7 +31,7 @@ filter_scalars:
   1:
     scenario_key:
       - "ALL"
-      - "2050-100-gas_moreCH4"
+      - "2050-100-plus"
       - "2050-base"
       - "reduction_100"
 
@@ -44,7 +44,7 @@ paths_timeseries:
 
 filter_timeseries:
   scenario_key:
-    - "2050-100-gas_moreCH4"
+    - "2050-100-plus"
     - "ALL"
   timeindex_start:
     "2050-01-01 00:00:00"
