@@ -2,29 +2,29 @@
 r"""
 Inputs
 -------
-filename_wind : str
-    ``raw/time_series/ninja_wind_country_DE_current_merra-2_nuts-2_corrected.csv``: Path incl. file
-    name of wind feed-in time series of renewables ninja
+filename_pv_facade : str
+    ``raw/time_series/pv_feedin_facade_try_mean_rcp85_p3.csv``: Path incl. feed-in time series for pv facade
 filename_pv : str
-    ``raw/time_series/ninja_pv_country_DE_merra-2_nuts-2_corrected.csv``: Path incl. file name of pv
-    feed-in time series of renewables ninja
-filename_ror : str
-    ``raw/time_series/DIW_Hydro_availability.csv``: Path incl. file name of feed-in time series of
-    run-of-river power plants
+    ``raw/time_series/pv_feed_in_try_mean_rcp85_p3.c``: Path incl. feed-in time series for pv roof
+filename_solarthermal : str
+    ``raw/time_series/solarthermal_feed_in_try_mean_rcp85_p3.csv``: Path incl. feed-in time series for solarthermal
 output_file : str
     ``results/_resources/ts_feedin.csv``: Path incl. file name of prepared time series
 
 Outputs
 ---------
 pd.DataFrame
-    Prepared feed-in time series of pv, wind and hydropower
+    Prepared feed-in time series of pv roof, pv facade, and solarthermal
 
 Description
 -------------
-This script prepares wind, pv and run-of-the-river (ror) feed-in time series for the regions Berlin
-and Brandenburg. Raw data is read from csv-files from https://www.renewables.ninja/ (wind+pv) and
-https://zenodo.org/record/1044463 (ror) and is then formatted to fit the time series template of
-oemof-B3 (`schema/timeseries.csv`).
+This script prepares the time series of pv roof and solarthermal. In addition,
+the pv roof, pv facade, and solarthermal feed-in time series for the region Adlershof
+are formatted to fit the time series template of oemof-B3 (`schema/timeseries.csv`).
+The feedin time series for roof and facade pv are calculated with GSEE_for_ResQEnergy
+[https://github.com/NormanZielke/gsee_for_ResQEnergy/tree/main]. The feedin time series
+for solarthermal is calculated with the pre-calculation for `Solar thermal collector`
+from oemof.thermal [https://oemof-thermal.readthedocs.io/en/latest/solar_thermal_collector.html].
 
 """
 
@@ -46,9 +46,9 @@ def prepare_pv_time_series(filename_ts, year, type):
     Parameters
     ----------
     filename_ts : str
-        Path including file name to pv time series of GSEE
+        Path including file name to pv series with different azimuth angles
     year : int
-        Year for which time series is extracted from raw data in `filename_ts`
+        Year for which time series is prepared from feedin in `filename_ts`
     type : str
         Type of time series like 'solar-pv_roof'; used for column 'var_name' in output
 
@@ -115,12 +115,12 @@ def prepare_pv_time_series(filename_ts, year, type):
 
 def prepare_solarthermal_time_series(filename_ts, year, type):
     r"""
-    Prepares and formats time series of `type` `pv roof` or 'pv facade' for region 'AD'.
+    Prepares and formats time series of `type` `solarthermal' for region 'AD'.
 
     Parameters
     ----------
     filename_ts : str
-        Path including file name to pv time series of GSEE
+        Path including file name to pv time series of oemof.thermal
     year : int
         Year for which time series is extracted from raw data in `filename_ts`
     type : str
@@ -188,6 +188,24 @@ def prepare_solarthermal_time_series(filename_ts, year, type):
 
 
 def prepare_pv_facade_time_series(filename_ts, year, type):
+    r"""
+    Formats time series of `type` `pv_facade' for region 'AD'.
+
+    Parameters
+    ----------
+    filename_ts : str
+        Path including file name to pv time series of GSEE
+    year : int
+        Year for which time series is extracted from raw data in `filename_ts`
+    type : str
+        Type of time series like 'solar-pv_roof'; used for column 'var_name' in output
+
+    Returns
+    -------
+    ts_prepared : pd.DataFrame
+        Contains time series in the format of time series template of oemof-B3
+
+    """
     ts_facade_raw = pd.read_csv(filename_ts, index_col=0, parse_dates=True)
 
     # extract one specific year and select only pv_facade column

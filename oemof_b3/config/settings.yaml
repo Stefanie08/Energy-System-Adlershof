@@ -48,11 +48,10 @@ prepare_electricity_demand:
 
 prepare_feedin:
   years: [2050]
-  # specific to wind and pv time series
   region: AD
   ts_var_unit: None
-  ts_source: https://www.renewables.ninja/
-  ts_comment: navigate to country Germany
+  ts_source: Wista Management
+  ts_comment: TRY mean RCP 8.5
   total_roof_area: 310125
   efh_roof_area: 36372
   ghd_mfh_roof_area: 273753
