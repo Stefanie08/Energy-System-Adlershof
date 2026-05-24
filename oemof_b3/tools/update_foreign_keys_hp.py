@@ -38,12 +38,11 @@ def update_foreign_keys(datapackage_path, updates_dict, target_field):
     print("datapackage.json successfully updated.")
 
 
-def update_foreign_keys_hp():
-    # Parameters
-    scenario = "2050-100-greenfield"
+def update_foreign_keys_hp(scenario):
+    # Path to your datapackage.json file
     scenario_path = (
         Path(__file__).resolve().parents[2] / "results" / scenario / "preprocessed"
-    )  # Path to your datapackage.json file
+    )
 
     datapackage_path = scenario_path / "datapackage.json"
 
