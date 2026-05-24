@@ -3,8 +3,8 @@
 
 # build_datapackage
 
-name: 2050-greenfield
-label: Greenfield
+name: 2050-100-greenfield
+label: AD-Greenfield
 
 datetimeindex:
   start: "2050-01-01"
