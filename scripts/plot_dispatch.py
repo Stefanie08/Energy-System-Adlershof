@@ -104,6 +104,18 @@ def plot_dispatch_data(df, df_demand, bus_name):
     for i in df_demand.columns:
         COLORS[i] = "#000000"
 
+    # sort positive and negative flows from biggest to smallest
+
+    pos_cols = df.columns[df.sum() > 0]
+    neg_cols = df.columns[df.sum() <= 0]
+
+    pos_sorted = df[pos_cols].sum().sort_values(ascending=True).index
+    neg_sorted = (
+        df[neg_cols].sum().sort_values(ascending=False).index
+    )
+
+    df = df[list(pos_sorted) + list(neg_sorted)]
+
     # interactive plotly dispatch plot
     fig_plotly = plots.plot_dispatch_plotly(
         df=df, df_demand=df_demand, unit="W", colors_odict=COLORS
@@ -120,20 +132,60 @@ def plot_dispatch_data(df, df_demand, bus_name):
         full_html=False,
     )
 
-    # normal dispatch plot
-    # plot one winter and one summer month
-    # select timeframe
+    # merge excess/shortage pairs into one legend entry
+    simple_labels_dict = {
+        "Strom shortage / Abregelung": ["Strom shortage", "Abregelung"],
+        "zen. Wärme mismatch": ["zen. Wärmeüberschuss", "zen. Wärme shortage"],
+        "dez. Wärme mismatch": ["dez. Wärmeüberschuss", "dez. Wärme shortage"],
+    }
+
     year = df.index[0].year
+
+    # daily resample of values
+    df_daily = df.resample("D").mean()
+    df_demand_daily = df_demand.resample("D").mean()
+
+    if not df_daily.empty:
+        fig, ax = plt.subplots(figsize=(20, 5))
+        plots.plot_dispatch(
+            ax=ax,
+            df=df_daily,
+            df_demand=df_demand_daily,
+            unit="W",
+            colors_odict=COLORS,
+        )
+        ax.grid(axis="y", linestyle="--", alpha=0.5)
+        ax.set_xlabel("Monat", fontsize=14)
+        ax.set_ylabel("Erzeugte Leistung", fontsize=14)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+
+        handles, labels = reduce_labels(ax=ax, simple_labels_dict=simple_labels_dict)
+        ax.legend(
+            handles=handles,
+            labels=labels,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.18),
+            fancybox=True,
+            ncol=5,
+            fontsize=14,
+        )
+        fig.tight_layout()
+        file_name = bus_name + "_year" + config.settings.general.plot_filetype
+        fig.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+        plt.close(fig)
+
+    # plots for specific months
     timeframe = [
         (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),
+        (f"{year}-04-01 00:00:00", f"{year}-04-30 23:00:00"),
         (f"{year}-07-01 00:00:00", f"{year}-07-31 23:00:00"),
-        # (f"{year}-01-01 00:00:00", f"{year}-12-31 23:00:00"),
+        (f"{year}-10-01 00:00:00", f"{year}-10-31 23:00:00"),
     ]
 
     for start_date, end_date in timeframe:
-        fig, ax = plt.subplots(figsize=(15, 5))
-
-        # filter timeseries
         df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
         df_demand_time_filtered = plots.filter_timeseries(
             df_demand, start_date, end_date
@@ -143,7 +195,7 @@ def plot_dispatch_data(df, df_demand, bus_name):
             logger.warning(f"Data for bus '{bus_name}' is empty, cannot plot.")
             continue
 
-        # plot time filtered data
+        fig, ax = plt.subplots(figsize=(15, 5))
         plots.plot_dispatch(
             ax=ax,
             df=df_time_filtered,
@@ -151,63 +203,30 @@ def plot_dispatch_data(df, df_demand, bus_name):
             unit="W",
             colors_odict=COLORS,
         )
-
-        plt.grid()
-        plt.xlabel("Date (mm-dd)", loc="center", fontdict={"size": 17})
-        plt.ylabel("Power", loc="center", fontdict={"size": 17})
+        ax.grid(axis="y", linestyle="--", alpha=0.5)
+        ax.set_xlabel("Datum (MM-TT)", fontsize=14)
+        ax.set_ylabel("Erzeugte Leistung", fontsize=14)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        # format x-axis representing the dates
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-        plt.gca().xaxis.set_major_locator(mdates.WeekdayLocator())
-
-        # Shrink current axis's height by 10% on the bottom
-        box = ax.get_position()
-        ax.set_position(
-            [box.x0, box.y0 + box.height * 0.15, box.width, box.height * 0.85]
-        )
-
-        # Simplify legend. As there is only one color per technology, there should
-        # be only one label per technology.
-        simple_labels_dict = {
-            "Battery": ["Battery out", "Battery in"],
-            "El. transmission external": ["El. import", "El. export"],
-            "El. transmission B-BB": [
-                "El. transmission in",
-                "El. transmission out",
-            ],
-            "El. shortage / curtailment": ["El. shortage", "Curtailment"],
-            "Heat cen. storage": ["Heat cen. storage out", "Heat cen. storage in"],
-            "Heat cen. mismatch": ["Heat cen. excess", "Heat cen. shortage"],
-            "Heat dec. storage": ["Heat dec. storage out", "Heat dec. storage in"],
-            "Heat dec. mismatch": ["Heat dec. excess", "Heat dec. shortage"],
-        }
 
         handles, labels = reduce_labels(ax=ax, simple_labels_dict=simple_labels_dict)
-
-        # Put a legend below current axis
-
         ax.legend(
             handles=handles,
             labels=labels,
             loc="upper center",
-            bbox_to_anchor=(0.5, -0.25),
+            bbox_to_anchor=(0.5, -0.18),
             fancybox=True,
-            ncol=4,
+            ncol=5,
             fontsize=14,
         )
-
-        # remove year from xticks
-        formatter = mdates.DateFormatter("%m-%d")
-        ax.xaxis.set_major_formatter(formatter)
-        locator = mdates.AutoDateLocator()
-        ax.xaxis.set_major_locator(locator)
-
         fig.tight_layout()
         file_name = (
             bus_name + "_" + start_date[5:7] + config.settings.general.plot_filetype
         )
-        plt.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+        fig.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
+        plt.close(fig)
 
 
 def get_df_for_aggregation(list_with_dfs):

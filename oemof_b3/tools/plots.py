@@ -39,7 +39,10 @@ def set_scenario_labels(df):
             return scenario
         return scenario_settings.get("label", scenario)
 
-    df.index = df.index.map(get_scenario_label)
+    if "scenario_key" in df.columns:
+        df["scenario_key"] = df["scenario_key"].map(get_scenario_label)
+    else:
+        df.index = df.index.map(get_scenario_label)
     return df
 
 
