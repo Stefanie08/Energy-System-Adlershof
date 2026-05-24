@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # add metadata
     edp.infer_metadata(foreign_keys_update=foreign_keys_update)
 
-    update_foreign_keys_hp()
+    update_foreign_keys_hp(scenario_specs["name"])
 
     logger.info(
         f"Saved updated foreign key references for heat pump "
