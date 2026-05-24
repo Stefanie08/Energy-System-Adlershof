@@ -56,7 +56,7 @@ from oemof_b3.config import config
 def get_shares_building_distribution(path, region):
     """
     This function calculates the share of single family houses (Einfamilienhaus: efh),
-    multi-family houses (Mehrfamilienhaus: mfh), labs, universities, offices, and commercial,
+    multi-family houses (Mehrfamilienhaus: mfh), labs, datacenter, and commercial,
     trade, and services (GHD) from the building distribution in input data
 
     Parameters
@@ -65,12 +65,12 @@ def get_shares_building_distribution(path, region):
         Path to data
 
     region : str
-        Region (eg. Brandenburg)
+        Region (eg. Adlershof)
 
     Returns
     -------
     shares : dict[str, float]
-        Mapping from building type ('sfh', 'mfh', 'lab', 'uni', 'office', 'ghd')
+        Mapping from building type ('sfh', 'mfh', 'lab', 'dc', 'ghd')
         to its relative share in the total building distribution.
     """
     # Get share of EFH and MFH from distribution of households
@@ -96,7 +96,7 @@ def find_regional_files(path, region):
         Path to data
 
     region : str
-        Region (eg. Brandenburg)
+        Region (eg. Adlershos)
 
     Returns
     -------
@@ -193,7 +193,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
     carrier : str
          Name of carrier (eg.: heat_central, heat_decentral)
     region : str
-        Region (eg. Brandenburg)
+        Region (eg. Adlershos)
 
     Returns
     -------
@@ -204,7 +204,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
         Unit of total demands (eg. GWh)
 
     """
-    consumers = ["ghd", "hh", "office", "lab", "uni"]
+    consumers = ["ghd", "hh", "dc", "lab"]
     demands = pd.DataFrame()
 
     sc_filtered = dp.filter_df(scalars, "type", "load")
@@ -222,7 +222,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
     if not (sc_filtered["var_unit"].values[0] == sc_filtered["var_unit"].values).all():
         raise ValueError(
             f"Unit mismatch in scalar data of heat demands. "
-            f"Please make sure units match in {in_path3}."
+            f"Please make sure units match in {in_path2}."
         )
 
     demand_unit = list(set(sc_filtered["var_unit"]))
@@ -233,7 +233,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
         if len(sc_filtered_consumer) > 1:
             logger.warning(
                 f"There is duplicate demand of carrier '{carrier}', consumer "
-                f"'{consumer}', region '{region}' and scenario '{scenario}' in {in_path3}."
+                f"'{consumer}', region '{region}' and scenario '{scenario}' in {in_path2}."
                 + "\n"
                 + "The demand is going to be summed up. "
                 "Otherwise you have to rerun the calculation and provide only one demand of the "
@@ -291,7 +291,7 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands):
     elif carrier == "heat_central":
         if sector in ["sfh", "mfh"]:
             return pd.DataFrame()
-        elif sector in ["ghd", "office", "lab"]:
+        elif sector in ["ghd", "dc", "lab"]:
             heat_load_sector[f"{sector}_{carrier}"] = (
                 heat_load["heat_demand"] * yearly_demands[sector + "_" + carrier][0]
             )
@@ -319,7 +319,6 @@ def prepare_heat_load_data(load, year):
     load = load.set_index(load["datetime"])
     load = load.drop(["datetime"], axis=1)
 
-    # convert from kW to MW Todo: hard coded
     load["heat_demand"] = load["heat_demand"] / 1000
 
     return load
@@ -352,7 +351,6 @@ if __name__ == "__main__":
     total_heat_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
 
     # create empty data frame for yearly demands
-    # Todo: hard coded 2050, make flexible --> settings
     heat_load_consumer_total = pd.DataFrame(
         index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
     )
@@ -439,7 +437,7 @@ if __name__ == "__main__":
     demand_per_sector = dp.filter_df(
         sc,
         "tech",
-        ["demand_hh", "demand_ghd", "demand_office", "demand_lab"],  # "demand_uni"
+        ["demand_hh", "demand_ghd", "demand_dc", "demand_lab"],
     )
     aggregated_demands = dp.aggregate_scalars(
         demand_per_sector,
