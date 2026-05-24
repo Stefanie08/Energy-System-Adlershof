@@ -50,8 +50,8 @@ prepare_feedin:
   years: [2050]
   region: AD
   ts_var_unit: None
-  ts_source: Wista Management
-  ts_comment: TRY mean RCP 8.5
+  ts_source: GSEE_for_ResQEnergy and oemof.thermal
+  ts_comment: weather data TRY mean RCP 8.5
   total_roof_area: 310125
   efh_roof_area: 36372
   ghd_mfh_roof_area: 273753
