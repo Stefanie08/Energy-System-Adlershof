@@ -228,10 +228,11 @@ if __name__ == "__main__":
                 typemap=TYPEMAP,
             )
 
+        # creates energy system overview
         esgr = ESGraphRenderer(
             es,
             legend=True,
-            filepath=r"/Users/diephangnguyen/Desktop/MA-Wetterdaten/Auswertung/dispatch/energy_system",
+            filepath=os.path.join(optimized, "energy_system_graph."),
             img_format="pdf",
         )
         esgr.render()
