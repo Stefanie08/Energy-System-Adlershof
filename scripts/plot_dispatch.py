@@ -110,9 +110,7 @@ def plot_dispatch_data(df, df_demand, bus_name):
     neg_cols = df.columns[df.sum() <= 0]
 
     pos_sorted = df[pos_cols].sum().sort_values(ascending=True).index
-    neg_sorted = (
-        df[neg_cols].sum().sort_values(ascending=False).index
-    )
+    neg_sorted = df[neg_cols].sum().sort_values(ascending=False).index
 
     df = df[list(pos_sorted) + list(neg_sorted)]
 
