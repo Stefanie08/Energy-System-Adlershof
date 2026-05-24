@@ -513,8 +513,7 @@ if __name__ == "__main__":
     logger = config.add_snake_logger("plot_scalar_results")
 
     # User input
-    CARRIERS = ["electricity", "heat_central", "heat_decentral", "gas", "ch4"]
-    CARRIERS_WO_CH4 = ["electricity", "heat_central", "heat_decentral", "gas"]
+    CARRIERS = ["electricity", "heat_central", "heat_decentral", "gas"]
 
     # create the directory plotted where all plots are saved
     if not os.path.exists(target):
@@ -524,12 +523,12 @@ if __name__ == "__main__":
     scalars = load_scalar_results(scalars_path)
     scalars = set_scenario_labels(scalars)
 
-    plot_invest_out_multi_carrier(CARRIERS_WO_CH4)
-    plot_flow_out_multi_carrier(CARRIERS_WO_CH4)
+    plot_invest_out_multi_carrier(CARRIERS)
+    plot_flow_out_multi_carrier(CARRIERS)
     plot_demands(CARRIERS)
-    subplot_invest_out_multi_carrier(CARRIERS_WO_CH4)
-    subplot_storage_invest_multi_carrier(CARRIERS_WO_CH4)
-    subplot_flow_out_multi_carrier(CARRIERS_WO_CH4)
+    subplot_invest_out_multi_carrier(CARRIERS)
+    subplot_storage_invest_multi_carrier(CARRIERS)
+    subplot_flow_out_multi_carrier(CARRIERS)
     subplot_demands(CARRIERS)
     subplot_energy_usage_multi_carrier(CARRIERS)
     plot_demands_stacked_carriers(CARRIERS)

@@ -31,8 +31,8 @@ optimize:
 
 plot_scalar_results:
   agg_regions: true
-  ignore_drop_level: "var_name"
-  tick_label_size: 12
+  ignore_drop_level: "scenario_key"
+  tick_label_size: 14
 
 prepare_cop_timeseries:
   quality_grade_air_source: 0.4
