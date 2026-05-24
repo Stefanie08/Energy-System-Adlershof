@@ -14,7 +14,7 @@ pandas.DataFrame
     with normalized load data of 50Hertz region in Germany from the years 2015, 2016, 2017, 2018
     and 2019. The data is normalized with the total electricity demand of the corresponding year.
 
-Description
+Description Todo:Change description
 -------------
 The corresponding snakemake rule of the preparation of the electricity demand profile
 downloads the 60 min timeseries data from OPSD and keeps it locally.
@@ -27,96 +27,232 @@ Note: the electricity demand profile for electric vehicle charging is prepared i
 """
 
 import sys
-import pandas as pd
 import os
+import datetime
+import itertools
+
+import pandas as pd
 import oemof_b3.tools.data_processing as dp
+
 from oemof_b3.config import config
+from scripts.prepare_heat_demand import (
+    get_year,
+    find_regional_files,
+    get_shares_building_distribution,
+)
 
 
-def prepare_load_profile_time_series(ts_raw, year, region):
-    r"""
-    Prepares and formats time series of load for region 'B' and 'BB'.
-    The load profile is normalized with the total energy demand of a year.
+def prepare_electricity_load_data(load, year):
+    """
+    This function reads the load data, changes the format of the datetime column to
+    yyyy-mm-dd hh:mm:ss, and sets the datetime column as index and converts the load from kW to MW.
 
     Parameters
     ----------
-    ts_raw : pd.DataFrame
-        Contains actual load data from 50hertz region from opsd load data
-    year : int
-        Year for which time series is extracted from raw data in `ts_raw`
-    region : str
-        Region of time series; used for column 'region' in output
+    load : DataFrame
+        Dataframe electricity load data
+    year : str
+        Year e.g. "2050"
 
     Returns
     -------
-    ts_prepared : pd.DataFrame
-        Contains time series in the format of timeseries template.
+    load : DataFrame
+        Dataframe with renamed header and datetime column as index, load in MW
+    """
+    load = pd.read_csv(load, delimiter=",")
+    load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})
+    load = load.rename(columns={"Strom gesamt (kW)": "electricity_demand"})
+
+    # change format of datetime col to yyyy-mm-dd hh:mm:ss
+    load["datetime"] = pd.to_datetime(load["datetime"], format="%d-%m %H:%M")
+    load["datetime"] = load["datetime"].apply(lambda x: x.replace(year=year))
+    load = load.set_index(load["datetime"])
+    load = load.drop(["datetime"], axis=1)
+
+    # convert from kW to MW
+    load["electricity_demand"] = load["electricity_demand"] / 1000
+
+    return load
+
+
+def get_electricity_demand(scalars, scenario, carrier, region):
+    """
+    This function returns the electricity demands together with their unit of a given region and a
+    given scenario.
+
+    Parameters
+    ----------
+    scalars : DataFrame
+        Dataframe with scalars
+    scenario : str
+        Scenario e.g. "2040-el_eff"
+    carrier : str
+         Name of carrier (eg.: electricity)
+    region : str
+        Region (eg. Adlershof
+
+    Returns
+    -------
+    demands : DataFrame
+        Dataframe with total yearly demand of electricity demand for a region.
+    demand_unit : str
+        Unit of total demands (eg. GWh)
 
     """
-    # copy data frame
-    time_series = ts_raw.copy()
+    demands = pd.DataFrame()
 
-    # extract one specific `year`
-    time_series = time_series[time_series.index.year == year]
+    sc_filtered = dp.filter_df(scalars, "type", "load")
+    sc_filtered = dp.filter_df(sc_filtered, "carrier", carrier)
+    sc_filtered = dp.filter_df(sc_filtered, "region", region)
+    sc_filtered = dp.filter_df(sc_filtered, "scenario_key", scenario)
+    if sc_filtered.empty or sc_filtered["var_value"].isna().all():
+        raise ValueError(
+            f"No scalar data found that matches "
+            f"scenario='{scenario}', "
+            f"carrier='{carrier}', "
+            f"region='{region}'"
+        )
 
-    # normalize with total electricity demand in year
-    time_series.iloc[:, 0] = time_series.iloc[:, 0] / time_series.iloc[:, 0].sum()
+    if not (sc_filtered["var_unit"].values[0] == sc_filtered["var_unit"].values).all():
+        raise ValueError(
+            f"Unit mismatch in scalar data of heat demands. "
+            f"Please make sure units match in {scalars}."
+        )
 
-    # bring time series to oemof-B3 format with `stack_timeseries()` and `format_header()`
-    ts_stacked = dp.stack_timeseries(time_series).rename(columns={"var_name": "region"})
-    ts_prepared = dp.format_header(
-        df=ts_stacked,
-        header=dp.HEADER_B3_TS,
-        index_name=config.settings.general.ts_index_name,
+    demand_unit = list(set(sc_filtered["var_unit"]))
+    demands[carrier] = sc_filtered["var_value"].values
+
+    return demands, demand_unit
+
+
+def calc_electricity_load(electricity_load, yearly_demands, sector, carrier):
+    """
+    This function calculates the electricity load by multiplying
+    the load profile with the share of the sector in the building distribution and the total
+    yearly demand of the sector.
+
+    Parameters
+    ----------
+    load_data : pd.DataFrame
+        DataFrame with load profile data
+
+    shares : dict[str, float]
+        Mapping from building type ('sfh', 'mfh', 'lab', 'uni', 'office', 'ghd')
+        to its relative share in the total building distribution.
+    yearly_demands : dict[str, float]
+        Mapping from sector name to total yearly demand of the sector in the region and scenario.
+    sector : str
+        Sector name (eg. 'sfh', 'mfh', 'lab', 'uni
+        'office', 'ghd')
+
+    Returns
+    -------
+    electricity_load : pd.DataFrame
+        DataFrame with electricity load for each sector and carrier.
+    """
+    # calculate electricity load profile of year
+    electricity_load_sector = pd.DataFrame(
+        index=pd.date_range(
+            datetime.datetime(year, 1, 1, 0), periods=len(electricity_load), freq="h"
+        )
     )
 
-    # add additional information as required by template
-    ts_prepared.loc[:, "region"] = region
-    ts_prepared.loc[
-        :, "var_unit"
-    ] = config.settings.prepare_electricity_demand.ts_var_unit
-    ts_prepared.loc[:, "var_name"] = config.settings.prepare_electricity_demand.var_name
-    ts_prepared.loc[:, "source"] = config.settings.prepare_electricity_demand.ts_source
-    ts_prepared.loc[
-        :, "comment"
-    ] = config.settings.prepare_electricity_demand.ts_comment
-    ts_prepared.loc[
-        :, "scenario_key"
-    ] = "ALL"  # The profile is not varied in different scenarios
+    electricity_load_sector[sector + "_" + carrier] = (
+        electricity_load["electricity_demand"] * yearly_demands[carrier].values
+    )
 
-    return ts_prepared
+    return electricity_load_sector
 
 
 if __name__ == "__main__":
-    opsd_ts_data = sys.argv[1]
-    output_file = sys.argv[2]
+    electricity_ts_data = sys.argv[1]
+    scalars = sys.argv[2]
+    output_file = sys.argv[3]
 
     # initialize data frame
     time_series_df = pd.DataFrame()
 
-    # download raw time series from OPSD
-    ts_raw = pd.read_csv(opsd_ts_data, index_col=0)
-    ts_raw.index = pd.to_datetime(ts_raw.index, utc=True)
-    # filter for 50hertz actual load
-    ts_raw = ts_raw[[config.settings.prepare_electricity_demand.col_select]]
+    # Read state demand of all sectors
+    sc = dp.load_b3_scalars(scalars)
+
+    CARRIERS = ["electricity"]
+
+    # filter for electricity data
+    sc_filtered = dp.filter_df(sc, "type", "load")
+
+    sc_filtered = dp.filter_df(sc_filtered, "carrier", CARRIERS)
+
+    sc_filtered = dp.filter_df(sc_filtered, "tech", "demand")
+
+    # get regions from data
+    regions = sc_filtered.loc[:, "region"].unique()
+
+    scenarios = sc_filtered.loc[:, "scenario_key"].unique()
+
+    # create empty data frame for results / output
+    ex_df = pd.DataFrame()
+    total_electricity_load = pd.DataFrame(columns=dp.HEADER_B3_TS)
+
+    ts_data = pd.DataFrame(
+        index=pd.date_range(datetime.datetime(2050, 1, 1, 0), periods=8760, freq="h")
+    )
 
     # prepare time series for each year and region
-    for year in config.settings.prepare_electricity_demand.opsd_years:
-        for region in config.settings.prepare_electricity_demand.regions:
-            # prepare opsd 50hertz actual load time series
-            load_ts = prepare_load_profile_time_series(
-                ts_raw=ts_raw, year=year, region=region
+    for region, scenario in itertools.product(regions, scenarios):
+        demand_file_names = find_regional_files(electricity_ts_data, region)
+
+        for demand_file_name, carrier in itertools.product(demand_file_names, CARRIERS):
+            # read year from weather file name
+            year = get_year(demand_file_name)
+
+            # get heat demand in region and scenario
+            yearly_demands, sc_demand_unit = get_electricity_demand(
+                sc_filtered, scenario, carrier, region
             )
 
-            # add time series to `time_series_df`
-            time_series_df = pd.concat([time_series_df, load_ts], axis=0)
+            # get sector name from file
+            sector = demand_file_name.split("_", 1)[0]
 
-    # set index
-    time_series_df.reset_index(drop=True, inplace=True)
-    time_series_df.index.name = config.settings.general.ts_index_name
+            electricity_load_ts_info = {
+                "region": region,
+                "scenario_key": scenario,
+                "var_unit": sc_demand_unit,
+            }
 
-    # create output directory in case it does not exist, yet and save data to `output_file`
+            # rename col names of load data
+            electricity_load_data = prepare_electricity_load_data(
+                os.path.join(electricity_ts_data, demand_file_name), year
+            )
+
+            # calculate the electricity load for the sector
+            electricity_load = calc_electricity_load(
+                electricity_load_data, yearly_demands, sector, carrier
+            )
+
+            ex_df[sector + "_" + carrier] = (
+                electricity_load.get("electricity_demand", 0) + electricity_load
+            )
+        # sum up all sectors to get total electricity demand
+        ts_data["electricity-demand-profile"] = ex_df.sum(axis=1)
+
+        frames = []
+        frames.append(
+            dp.prepare_b3_timeseries(
+                ts_data[["electricity-demand-profile"]],
+                **electricity_load_ts_info,
+            )
+        )
+
+        total_electricity_load = pd.concat(
+            [total_electricity_load, *frames], ignore_index=True
+        )
+
+        # set index
+        total_electricity_load.reset_index(drop=True, inplace=True)
+        total_electricity_load.index.name = config.settings.general.ts_index_name
+
+        # create output directory in case it does not exist, yet and save data to `output_file`
     output_dir = os.path.dirname(output_file)
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    dp.save_df(time_series_df, output_file)
+    dp.save_df(total_electricity_load, output_file)

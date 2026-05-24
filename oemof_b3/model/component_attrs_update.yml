@@ -1,84 +1,30 @@
-ch4-demand:
-  carrier: ch4
-  tech: demand
-  type: load
-  foreign_keys:
-    bus: ch4
-    profile: ch4-demand-profile
-
-ch4-import:
-  carrier: ch4
+gas-import:
+  carrier: gas
   tech: import
   type: shortage
   foreign_keys:
-    bus: ch4
+    bus: gas
   defaults:
     output_parameters: "{}"
 
-ch4-export:
-  carrier: ch4
-  tech: export
-  type: excess
-  foreign_keys:
-    bus: ch4
-  defaults:
-    input_parameters: "{}"
-
-ch4-shortage:
-  carrier: ch4
+gas-shortage:
+  carrier: gas
   tech: shortage
   type: shortage
   foreign_keys:
-    bus: ch4
+    bus: gas
   defaults:
     output_parameters: "{}"
 
-h2-import:
-  carrier: h2
-  tech: import
-  type: shortage
-  foreign_keys:
-    bus: h2
-  defaults:
-    output_parameters: "{}"
-
-h2-export:
-  carrier: h2
-  tech: export
+gas-excess:
+  carrier: gas
+  tech: excess
   type: excess
   foreign_keys:
-    bus: h2
+    bus: gas
   defaults:
+    marginal_cost: 0
     input_parameters: "{}"
-
-h2-shortage:
-  carrier: h2
-  tech: shortage
-  type: shortage
-  foreign_keys:
-    bus: h2
-  defaults:
-    output_parameters: "{}"
-
-electricity-electrolyzer:
-  carrier: electricity
-  tech: electrolyzer
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: h2
-  defaults:
-    output_parameters: "{}"
-
-electricity-heatpump_large:
-  carrier: electricity
-  tech: heatpump_large
-  type: conversion
-  foreign_keys:
-    from_bus: electricity
-    to_bus: heat_central
-  defaults:
-    output_parameters: "{}"
 
 electricity-heatpump_small:
   carrier: electricity
@@ -87,7 +33,29 @@ electricity-heatpump_small:
   foreign_keys:
     from_bus: electricity
     to_bus: heat_decentral
-    efficiency: efficiency-profile
+    efficiency: electricity-heatpump_small-profile
+  defaults:
+    output_parameters: "{}"
+
+electricity-heatpump_river_large:
+  carrier: electricity
+  tech: heatpump_river_large
+  type: conversion
+  foreign_keys:
+    from_bus: electricity
+    to_bus: heat_central
+    efficiency: electricity-heatpump_river_large-profile
+  defaults:
+    output_parameters: "{}"
+
+electricity-heatpump_geo_large:
+  carrier: electricity
+  tech: heatpump_geo_large
+  type: conversion
+  foreign_keys:
+    from_bus: electricity
+    to_bus: heat_central
+    efficiency: electricity-heatpump_geo_large-profile
   defaults:
     output_parameters: "{}"
 
@@ -136,9 +104,37 @@ heat_central-shortage:
   defaults:
     output_parameters: "{}"
 
-heat_central-storage:
+heat_central-import:
   carrier: heat_central
-  tech: storage
+  tech: import
+  type: shortage
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    output_parameters: "{}"
+
+heat_central-export:
+  carrier: heat_central
+  tech: export
+  type: excess
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    input_parameters: "{}"
+
+heat_central-district_heating_storage:
+  carrier: heat_central
+  tech: district_heating_storage
+  type: storage
+  foreign_keys:
+    bus: heat_central
+  defaults:
+    input_parameters: "{}"
+    output_parameters: "{}"
+
+heat_central-aquifer_storage:
+  carrier: heat_central
+  tech: aquifer_storage
   type: storage
   foreign_keys:
     bus: heat_central
@@ -173,9 +169,18 @@ heat_decentral-shortage:
   defaults:
     output_parameters: "{}"
 
-heat_decentral-storage:
+heat_decentral-import:
   carrier: heat_decentral
-  tech: storage
+  tech: import
+  type: shortage
+  foreign_keys:
+    bus: heat_decentral
+  defaults:
+    output_parameters: "{}"
+
+heat_decentral-buffer_storage:
+  carrier: heat_decentral
+  tech: buffer_storage
   type: storage
   foreign_keys:
     bus: heat_decentral
@@ -183,43 +188,47 @@ heat_decentral-storage:
     input_parameters: "{}"
     output_parameters: "{}"
 
-ch4-boiler_large:
-  carrier: ch4
+gas-boiler_large:
+  carrier: gas
   tech: boiler_large
   type: conversion
   foreign_keys:
-    from_bus: ch4
+    from_bus: gas
     to_bus: heat_central
   defaults:
     output_parameters: "{}"
 
-ch4-boiler_small:
-  carrier: ch4
+gas-boiler_small:
+  carrier: gas
   tech: boiler_small
   type: conversion
   foreign_keys:
-    from_bus: ch4
+    from_bus: gas
     to_bus: heat_decentral
   defaults:
     output_parameters: "{}"
 
-ch4-bpchp:
-  carrier: ch4
+gas-bpchp:
+  carrier: gas
   tech: bpchp
   type: backpressure
   foreign_keys:
-    fuel_bus: ch4
+    fuel_bus: gas
     electricity_bus: electricity
     heat_bus: heat_central
+  defaults:
+    capacity_potential: +.inf
 
-h2-bpchp:
-  carrier: h2
-  tech: bpchp
+gas-gt:
+  carrier: gas
+  tech: gt
   type: backpressure
   foreign_keys:
-    fuel_bus: h2
+    fuel_bus: gas
     electricity_bus: electricity
     heat_bus: heat_central
+  defaults:
+    capacity_potential: +.inf #high value to avoid capacity constraint
 
 electricity-pth:
   carrier: electricity
@@ -231,34 +240,6 @@ electricity-pth:
   defaults:
     output_parameters: "{}"
 
-h2-demand:
-  carrier: h2
-  tech: demand
-  type: load
-  foreign_keys:
-    bus: h2
-    profile: h2-demand-profile
-
-h2-cavern:
-  carrier: h2
-  tech: cavern
-  type: storage
-  foreign_keys:
-    bus: h2
-  defaults:
-    input_parameters: "{}"
-    output_parameters: "{}"
-
-h2-excess:
-  carrier: h2
-  tech: excess
-  type: excess
-  foreign_keys:
-    bus: h2
-  defaults:
-    marginal_cost: 0
-    input_parameters: "{}"
-
 electricity-bev_charging:
   carrier: electricity
   tech: bev_charging
@@ -266,3 +247,36 @@ electricity-bev_charging:
   foreign_keys:
     bus: electricity
     profile: electricity-bev_charging-profile
+
+solar-pv_roof:
+  carrier: solar
+  tech: pv_roof
+  type: volatile
+  foreign_keys:
+    bus: electricity
+    profile: solar-pv_roof-profile
+  defaults:
+    marginal_cost: 0
+    output_parameters: "{}"
+
+solar-pv_facade:
+  carrier: solar
+  tech: pv_facade
+  type: volatile
+  foreign_keys:
+    bus: electricity
+    profile: solar-pv_facade-profile
+  defaults:
+    marginal_cost: 0
+    output_parameters: "{}"
+
+solar-solarthermal:
+  carrier: solar
+  tech: solarthermal
+  type: volatile
+  foreign_keys:
+    bus: heat_decentral
+    profile: solar-solarthermal-profile
+  defaults:
+    marginal_cost: 0
+    output_parameters: "{}"

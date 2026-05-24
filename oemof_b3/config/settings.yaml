@@ -15,13 +15,13 @@ build_datapackage:
 
 optimize:
   filename_metadata: datapackage.json
-  solver: cbc
+  solver: gurobi
   solve_kwargs:
     tee: True
     keepfiles: True
   write_lp_file: False
   cmdline_options:
-    AllowableGap: 0.01
+    MIPGap: 0.01
   debug: true
   receive_duals: false
   el_gas_relation: electricity_gas_relation  # appears in build_datapackage as well
@@ -31,35 +31,30 @@ optimize:
 
 plot_scalar_results:
   agg_regions: true
-  ignore_drop_level: "var_name"
-  tick_label_size: 12
+  ignore_drop_level: "scenario_key"
+  tick_label_size: 14
 
 prepare_cop_timeseries:
-  quality_grade: 0.4
+  quality_grade_air_source: 0.4
+  quality_grade_water_source: 0.5
+  quality_grade_ground_source: 0.5
+  ground_source_temperature: 21
   scenario: ALL
 
 prepare_electricity_demand:
-  opsd_years: [2015, 2016, 2017, 2018, 2019]
-  regions: [BB, B]
+  regions: [AD]
   ts_var_unit: None
-  ts_source: https://data.open-power-system-data.org/time_series/2020-10-06
-  ts_comment: DE_50hertz actual load data
-  col_select:  DE_50hertz_load_actual_entsoe_transparency
   var_name: electricity-demand-profile
 
 prepare_feedin:
-  years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019]
-  # specific to wind and pv time series
-  nuts_de30: DE30
-  nuts_de40: DE40
-  rename_nuts: {DE30: B, DE40: BB}
+  years: [2050]
+  region: AD
   ts_var_unit: None
-  ts_source: https://www.renewables.ninja/
-  ts_comment: navigate to country Germany
-  # specific to ror time series
-  regions: [BB, B]
-  ts_source_ror: https://zenodo.org/record/1044463
-  ts_comment_ror: Isolated ror availability time series from DIW data
+  ts_source: GSEE_for_ResQEnergy and oemof.thermal
+  ts_comment: weather data TRY mean RCP 8.5
+  total_roof_area: 310125
+  efh_roof_area: 36372
+  ghd_mfh_roof_area: 273753
 
 prepare_vehicle_charging_demand:
   ts_var_unit: None
@@ -69,8 +64,9 @@ prepare_vehicle_charging_demand:
   home_end: "05:00"  # end charging strategy "balanced" for home profile
   work_start: "06:00"  # start charging strategy "balanced" for work profile
   work_end: "14:00"  # end charging strategy "balanced" for work profile
-  region_dict: {Berlin: B, Brandenburg: BB }
+  region_dict: {Adlershof: AD}
   var_name: electricity-bev_charging-profile
+  rescaling_factor: 0.000150594
 
 process_re_potential:
   var_unit: MW

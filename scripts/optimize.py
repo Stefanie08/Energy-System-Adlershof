@@ -48,6 +48,7 @@ from oemof_b3.tools import data_processing as dp
 from oemof.solph.constraints.equate_flows import equate_flows_by_keyword
 from oemof_b3.config import config
 from oemof_b3.tools.timing import Timer
+from oemof.visio import ESGraphRenderer
 
 
 logger = logging.getLogger()
@@ -227,6 +228,15 @@ if __name__ == "__main__":
                 typemap=TYPEMAP,
             )
 
+        # creates energy system overview
+        esgr = ESGraphRenderer(
+            es,
+            legend=True,
+            filepath=os.path.join(optimized, "energy_system_graph."),
+            img_format="pdf",
+        )
+        esgr.render()
+
         # Reduce number of timestep for debugging
         if config.settings.optimize.debug:
             es.timeindex = es.timeindex[:3]
@@ -249,10 +259,10 @@ if __name__ == "__main__":
 
         if emission_limit is not None:
             constraints.emission_limit(m, limit=emission_limit)
-        if el_gas_relations is not None:
-            add_electricity_gas_relation_constraints(
-                model=m, relations=el_gas_relations
-            )
+        # if el_gas_relations is not None:
+        #    add_electricity_gas_relation_constraints(
+        #        model=m, relations=el_gas_relations
+        #    )
 
         # tell the model to get the dual variables when solving
         if config.settings.optimize.receive_duals:

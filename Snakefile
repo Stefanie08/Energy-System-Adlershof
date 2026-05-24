@@ -87,7 +87,7 @@ rule clean:
         echo "Removed all results."
         """
 
-rule clean_on_win_sys:
+rule clean_win:
     shell:
         """
         for /d %p in (results\*) do @if not exist "%p\.gitkeep" rd /s /q "%p"

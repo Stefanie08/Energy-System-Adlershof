@@ -138,7 +138,7 @@ def prepare_vehicle_charging_demand(input_dir, balanced=True, const_share=None):
         ts = ts_raw[ts_raw.index.year == year]
 
         # resample (15 min to hourly), unit is kW
-        hourly_ts = ts.resample("H").mean()
+        hourly_ts = ts.resample("h").mean()
 
         if balanced:
             # smooth work and home profiles as they have high peaks (strategy balanced)
@@ -147,6 +147,12 @@ def prepare_vehicle_charging_demand(input_dir, balanced=True, const_share=None):
         # only keep column "sum CS power" (sum of power demand at all charging stations)
         ts_total_demand = pd.DataFrame(hourly_ts["sum CS power"]).rename(
             columns={"sum CS power": f"ts_{year}"}
+        )
+
+        # rescale "sum CS power" profile fitting for area of Adlershof by factor 0.000150594
+        ts_total_demand = (
+            ts_total_demand
+            * config.settings.prepare_vehicle_charging_demand.rescaling_factor
         )
 
         # divide by total electricity demand of vehicles

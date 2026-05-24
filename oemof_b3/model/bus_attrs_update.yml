@@ -1,4 +1,4 @@
-h2:
+gas:
   balanced:
     True
 
@@ -10,6 +10,3 @@ heat_decentral:
   balanced:
     True
 
-ch4:
-  balanced:
-    True

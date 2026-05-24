@@ -3,19 +3,16 @@
 
 # build_datapackage
 
-name: 2050-80-el_eff
-label: 80 EL-EFF
+name: 2050-100-plus
+label: AD+
 
 datetimeindex:
-  start:
-    "2019-01-01"
-  freq:
-    "H"
-  periods:
-    8760
+  start: "2050-01-01"
+  freq: "h"
+  periods: 8760
 
 model_structure:
-  model_structure_full
+  model_structure_AD_plus
 
 # parametrize
 
@@ -34,13 +31,11 @@ filter_scalars:
   1:
     scenario_key:
       - "ALL"
-      - "2050-el_eff"
+      - "2050-100-plus"
       - "2050-base"
-      - "reduction_80"
+      - "reduction_100"
 
 paths_timeseries:
-  - raw/time_series/ts_load_ch4.csv
-  - raw/time_series/ts_load_h2.csv
   - results/_resources/ts_efficiency_heatpump_small.csv
   - results/_resources/ts_feedin.csv
   - results/_resources/ts_load_electricity.csv
@@ -49,7 +44,7 @@ paths_timeseries:
 
 filter_timeseries:
   scenario_key:
-    - "2050-el_eff"
+    - "2050-100-plus"
     - "ALL"
   timeindex_start:
-    "2017-01-01 00:00:00"
+    "2050-01-01 00:00:00"
