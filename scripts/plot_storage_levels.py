@@ -119,7 +119,7 @@ def multiplot_df(df, figsize=None, sharex=True, colors=None, **kwargs):
         ax.set_yticklabels(["0%", "50%", "100%"], fontsize=12)
         ax.tick_params(axis="x", labelsize=12)
 
-        #ax.set_ylabel(name_col, rotation=0, ha="right")
+        # ax.set_ylabel(name_col, rotation=0, ha="right")
         ax.set_ylabel("Füllstand [%]", fontsize=12)
         ax.set_title(name_col, fontsize=12, loc="left", pad=4)
 
@@ -183,12 +183,10 @@ if __name__ == "__main__":
 
         # filter timeseries
         df_time_filtered = plots.filter_timeseries(data, start_date, end_date)
-        #df_time_filtered = df_time_filtered.resample("D").mean()
+        # df_time_filtered = df_time_filtered.resample("D").mean()
         df_time_filtered = df_time_filtered.resample("D").max()
 
-        df_time_filtered = df_time_filtered.loc[
-            :, df_time_filtered.max() > 1e-6
-        ]
+        df_time_filtered = df_time_filtered.loc[:, df_time_filtered.max() > 1e-6]
 
         if df_time_filtered.empty:
             logger.warning(f"Data in '{STORAGE_LEVEL_FILE}' is empty, cannot plot.")
@@ -198,8 +196,8 @@ if __name__ == "__main__":
         n_active = len(df_time_filtered.columns)
         fig, axs = multiplot_df(
             df_time_filtered,
-            #figsize=(7, max(3, n_active * 2.5)),  # ← dynamisch statt fest (9, 7)
-            figsize=(15,7),
+            # figsize=(7, max(3, n_active * 2.5)),  # ← dynamisch statt fest (9, 7)
+            figsize=(15, 7),
             linewidth=1,
             colors=COLORS,
         )
