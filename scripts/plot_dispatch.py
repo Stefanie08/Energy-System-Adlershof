@@ -144,7 +144,7 @@ def plot_dispatch_data(df, df_demand, bus_name):
     df_demand_daily = df_demand.resample("D").mean()
 
     if not df_daily.empty:
-        fig, ax = plt.subplots(figsize=(20, 5))
+        fig, ax = plt.subplots(figsize=(25, 10))
         plots.plot_dispatch(
             ax=ax,
             df=df_daily,
@@ -153,12 +153,12 @@ def plot_dispatch_data(df, df_demand, bus_name):
             colors_odict=COLORS,
         )
         ax.grid(axis="y", linestyle="--", alpha=0.5)
-        ax.set_xlabel("Monat", fontsize=14)
-        ax.set_ylabel("Erzeugte Leistung", fontsize=14)
+        ax.set_xlabel("Monat", fontsize=18)
+        ax.set_ylabel("Erzeugte Leistung", fontsize=18)
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
 
         handles, labels = reduce_labels(ax=ax, simple_labels_dict=simple_labels_dict)
         ax.legend(
@@ -167,10 +167,10 @@ def plot_dispatch_data(df, df_demand, bus_name):
             loc="upper center",
             bbox_to_anchor=(0.5, -0.18),
             fancybox=True,
-            ncol=5,
-            fontsize=14,
+            ncol=4,
+            fontsize=18,
         )
-        fig.tight_layout()
+        fig.subplots_adjust(bottom=0.3)  # fixer Platz für Legende unten
         file_name = bus_name + "_year" + config.settings.general.plot_filetype
         fig.savefig(os.path.join(plotted, file_name), bbox_inches="tight")
         plt.close(fig)
@@ -183,6 +183,18 @@ def plot_dispatch_data(df, df_demand, bus_name):
         (f"{year}-10-01 00:00:00", f"{year}-10-31 23:00:00"),
     ]
 
+    if "heat_decentral" in bus_name:
+        timeframe += [
+            (f"{year}-02-15 00:00:00", f"{year}-02-15 23:00:00"),  # Winterwoche
+            (f"{year}-07-10 00:00:00", f"{year}-07-10 23:00:00"),  # Sommertag
+        ]
+
+    if "electricity" in bus_name:
+        timeframe += [
+            (f"{year}-01-01 00:00:00", f"{year}-01-31 23:00:00"),  # anderer Wintertag
+            (f"{year}-07-10 00:00:00", f"{year}-07-10 23:00:00"),  # anderer Sommertag
+        ]
+
     for start_date, end_date in timeframe:
         df_time_filtered = plots.filter_timeseries(df, start_date, end_date)
         df_demand_time_filtered = plots.filter_timeseries(
@@ -193,7 +205,7 @@ def plot_dispatch_data(df, df_demand, bus_name):
             logger.warning(f"Data for bus '{bus_name}' is empty, cannot plot.")
             continue
 
-        fig, ax = plt.subplots(figsize=(15, 5))
+        fig, ax = plt.subplots(figsize=(20, 8))
         plots.plot_dispatch(
             ax=ax,
             df=df_time_filtered,
@@ -202,12 +214,28 @@ def plot_dispatch_data(df, df_demand, bus_name):
             colors_odict=COLORS,
         )
         ax.grid(axis="y", linestyle="--", alpha=0.5)
-        ax.set_xlabel("Datum (MM-TT)", fontsize=14)
-        ax.set_ylabel("Erzeugte Leistung", fontsize=14)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
-        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
+        ax.set_xlabel("Datum (MM-TT)", fontsize=18)
+        ax.set_ylabel("Erzeugte Leistung", fontsize=18)
+        # NACHHER — Dauer des Zeitraums berechnen und Formatter anpassen:
+        duration_days = (pd.Timestamp(end_date) - pd.Timestamp(start_date)).days
+
+        if duration_days <= 1:
+            # Tagesplot: nur Uhrzeit
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+            ax.xaxis.set_major_locator(mdates.HourLocator(interval=2))
+            ax.set_xlabel("Uhrzeit (HH:MM)", fontsize=18)
+        elif duration_days <= 7:
+            # Wochenplot: Wochentag + Uhrzeit
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+            ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
+            ax.set_xlabel("Datum", fontsize=18)
+        else:
+            # Monatsplot: wie bisher
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+            ax.set_xlabel("Datum (MM-TT)", fontsize=18)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
 
         handles, labels = reduce_labels(ax=ax, simple_labels_dict=simple_labels_dict)
         ax.legend(
@@ -216,10 +244,11 @@ def plot_dispatch_data(df, df_demand, bus_name):
             loc="upper center",
             bbox_to_anchor=(0.5, -0.18),
             fancybox=True,
-            ncol=5,
-            fontsize=14,
+            ncol=4,
+            fontsize=18,
         )
         fig.tight_layout()
+        fig.subplots_adjust(bottom=0.3)  # fixer Platz für Legende unten
         file_name = (
             bus_name + "_" + start_date[5:7] + config.settings.general.plot_filetype
         )

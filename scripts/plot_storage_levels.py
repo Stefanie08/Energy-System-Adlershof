@@ -103,7 +103,8 @@ def normalize_to_max(ts):
 def multiplot_df(df, figsize=None, sharex=True, colors=None, **kwargs):
     n_cols = len(df.columns)
 
-    fig, axs = plt.subplots(n_cols, 1, figsize=figsize, sharex=sharex)
+    fig, axs = plt.subplots(n_cols, 1, figsize=figsize, sharex=sharex, squeeze=False)
+    axs = axs.flatten()
 
     if colors:
         assert all(name_col in colors for name_col in df.columns)
@@ -111,8 +112,16 @@ def multiplot_df(df, figsize=None, sharex=True, colors=None, **kwargs):
     for ax, (name_col, series) in zip(axs, df.items()):
 
         ax.plot(series, color=colors[name_col], **kwargs)
+        ax.fill_between(series.index, series, alpha=0.8, color=colors[name_col])
+        ax.grid(axis="y", linestyle="--", alpha=0.5)
+        ax.set_ylim(0, 1.05)
+        ax.set_yticks([0, 0.5, 1])
+        ax.set_yticklabels(["0%", "50%", "100%"], fontsize=12)
+        ax.tick_params(axis="x", labelsize=12)
 
-        ax.set_ylabel(name_col, rotation=0, ha="right")
+        #ax.set_ylabel(name_col, rotation=0, ha="right")
+        ax.set_ylabel("Füllstand [%]", fontsize=12)
+        ax.set_title(name_col, fontsize=12, loc="left", pad=4)
 
     return fig, axs
 
@@ -174,19 +183,30 @@ if __name__ == "__main__":
 
         # filter timeseries
         df_time_filtered = plots.filter_timeseries(data, start_date, end_date)
+        #df_time_filtered = df_time_filtered.resample("D").mean()
+        df_time_filtered = df_time_filtered.resample("D").max()
+
+        df_time_filtered = df_time_filtered.loc[
+            :, df_time_filtered.max() > 1e-6
+        ]
 
         if df_time_filtered.empty:
             logger.warning(f"Data in '{STORAGE_LEVEL_FILE}' is empty, cannot plot.")
 
-        plt.rcParams.update({"font.size": 14})
+        plt.rcParams.update({"font.size": 12})
 
+        n_active = len(df_time_filtered.columns)
         fig, axs = multiplot_df(
-            df_time_filtered, figsize=(9, 5), linewidth=1, colors=COLORS
+            df_time_filtered,
+            #figsize=(7, max(3, n_active * 2.5)),  # ← dynamisch statt fest (9, 7)
+            figsize=(15,7),
+            linewidth=1,
+            colors=COLORS,
         )
 
-        plt.subplots_adjust(hspace=0.1)
+        plt.subplots_adjust(hspace=0.6)
 
-        plt.xlabel("Date", fontdict={"size": 17})
+        plt.xlabel("Monat", fontdict={"size": 12})
 
         # format x-axis representing the dates
         ax = axs[-1]
