@@ -1,38 +1,26 @@
-# Energy System Adlershof based on oemof-B3
+# Energy System Adlershof oemof-AD based on oemof-B3
 
-**This repo can soon be used to model the energy system of Adlershof in Berlin. Both the model and
-the documentation are under construction but will be updated frequently.** 
+This repo models the energy system of Adlershof in Berlin. It represents the sectors
+electricity, central and decentral heat. The model is a single-node model of the Adlershof district.
 
-oemof-B3 is an energy system model of Berlin and Brandenburg. It represents many sectors:
-Electricity, central and decentral heat, hydrogen, CO2 and methane. It is a multi-node-model, which
-means that several distinct regions are represented that are connected via transmission lines.
-
-<img src="/docs/_img/model_structure.svg" width="900"/>
+<img src="docs/_img/model_structure.png" width="900"/>
 
 The model is a perfect-foresight, cost minimizing linear optimization model that builds upon
 [oemof.solph](https://github.com/oemof/oemof-solph),
 [oemof.tabular](https://github.com/oemof/oemof-tabular),
 and [oemoflex](https://github.com/rl-institut/oemoflex).
 
-There are six scenarios available, that you can calculate with oemof-B3:
-- 2050-80-el_eff
-- 2050-80-gas_moreCH4
-- 2050-95-el_eff
-- 2050-95-gas_moreCH4
-- 2050-100-el_eff
-- 2050-100-gas_moreCH4
+There are two scenarios available:
+- `2050-100-plus` — 100% renewable energy supply with additional centralized heat supply
+- `2050-100-greenfield` — 100% renewable energy supply, greenfield optimization
 
-All six refer to the target year 2050. A further distinction is made between an emissions reduction
-of 80, 95 or 100 percent. Furthermore, the scenarios differ in their degree of electrification. 
-Scenarios with the index 'el_eff' represent strongly electrified scenarios, while 'gas_moreCH4'
-represent scenarios with increased use of methane.
-In the documentation you will find instructions on how to run the scenarios with oemof-B3.
+Both scenarios refer to the target year 2050 with a 100% reduction in CO2 emissions.
 
 ## Getting started
 
 ### Installation
 
-Currently, oemof-B3 needs python 3.8, 3.9 or 3.10 (newer versions may be supported, but installation can take very long).
+Currently, oemof-AD needs python 3.8, 3.9 or 3.10 (newer versions may be supported, but installation can take very long).
 
 Additionally, you need to install the python dependency manager [poetry](https://python-poetry.org/).
 It is recommended to install poetry system-wide via the command below or
@@ -71,11 +59,31 @@ To test if everything works, you can run the [examples](https://oemof-b3.readthe
 
 For developers: Please activate pre-commit hooks (via `pre-commit install`) in order to follow our coding styles.
 
-### Data
+### How to run the model
 
-Download the raw data for the model from zenodo via:
+To run a single scenario, execute:
 
-    snakemake -j1 download_raw_data
+    snakemake -j<NUMBER_OF_CPU_CORES> results/<scenario_name>/postprocessed
+
+whereby `scenario_name` corresponds to the name of the YAML file in the `scenarios` directory
+(e.g. `2050-100-plus`).
+
+To force re-run a specific rule for a scenario:
+
+    snakemake -j<NUMBER_OF_CPU_CORES> results/<scenario_name>/postprocessed --forcerun <rule_name>
+
+For example, to force re-run the postprocessing step:
+
+    snakemake -j1 results/2050-100-plus/postprocessed --forcerun postprocess
+
+> **Note:** The debug mode is activated by default. This will execute only three time steps of
+> the optimization. To turn it off, set `debug` to `false` in `oemof_b3/config/settings.yaml`.
+
+> **Reproducing results:** The raw input data is not publicly available for download.
+> To reproduce the results, the adapted raw data must be provided in the `raw` directory.
+> Additionally, after the preprocessing step, the `amount` of the `heat_central` demand
+> must be set to `1` manually in the scalar input data. This is due to a known issue in
+> the preprocessing script.
 
 ### Documentation
 
