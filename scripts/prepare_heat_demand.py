@@ -3,43 +3,30 @@ r"""
 Inputs
 -------
 in_path1 : str
-    ``raw/weatherdata``: path of input directory with weather data
+    ``raw/weatherdata``: path of input directory with regional heat load time series as .csv
 in_path2 : str
-    ``raw/distribution_households.csv``: path of input file with household distributions data
-    as .csv
-in_path3 : str
-    ``raw/holidays.csv``: path of input file with holidays of all states in Germany as .csv
-in_path4 : str
-    ``raw/building_class.csv``: path of input file with building classes of all states in Germany
-    as .csv
-in_path5 : str
-    ``raw/scalars/demands.csv``: path of scalar data as .csv
+    ``raw/scalars/demands.csv``: path of scalar data with yearly heat demands as .csv
 out_path1 : str
     ``results/_resources/scal_load_heat.csv``: path of output file with aggregated scalar data as
     .csv
 out_path2 : str
     ``results/_resources/ts_load_heat.csv``: path of output file with timeseries data as .csv
-logfile : str
-    ``results/_resources/load_heat.log``: path to logfile
 
 Outputs
 ---------
-pandas.DataFrame
-    with grouped and aggregated data of heat demands.
-    Data is grouped by region, energy source, technology and chp capability and contains
-    net capacity and efficiency.
+scal_load_heat.csv : pandas.DataFrame
+    Aggregated yearly heat demands per region, scenario and carrier.
+ts_load_heat.csv : pandas.DataFrame
+    Hourly heat demand profiles in oemof-B3 timeseries format, one row per
+    region-scenario-carrier combination.
 
-Description TODO: Change description
+Description
 -------------
-The script produces heat demand profiles using the demandlib.
-For this purpose, it reads the scalar input data and filters them according to the corresponding
-heat demand. By processing historical weather data as well as a household distribution in single-
-and multi-family houses that is assumed to be constant and the holidays belonging to the evaluated
-year, demandlib creates heat profiles, which are additionally normalized.
-Since the consumers trade, commerce and services (german: Gewerbe, Handel und Dienstleistungen
-(ghd)) and private household (hh) are processed individually by demandlib, they are also passed
-individually in the scalar input data. The script summarizes the respective demand of the consumers
-and stores it in scalar resources.
+Prepares hourly heat demand profiles for central and decentral heat per region and scenario.
+Regional load time series (1h resolution) are read and scaled to match the total yearly
+heat demands from the scalar data. Sectors (sfh, mfh, ghd, dc, lab) are aggregated into
+central and decentral heat demand profiles. Aggregated yearly scalar demands are also written
+as output.
 """
 import datetime
 import itertools
@@ -200,8 +187,8 @@ def get_heat_demand(scalars, scenario, carrier, region):
     demands : DataFrame
         Dataframe with total yearly demand of central and decentral heat per consumer
         (eg.: ghd, hh)
-    demand_unit : str
-        Unit of total demands (eg. GWh)
+    demand_unit : list of str
+        Unit(s) of total demands (eg. ['GWh'])
 
     """
     consumers = ["ghd", "hh", "dc", "lab"]
@@ -222,7 +209,7 @@ def get_heat_demand(scalars, scenario, carrier, region):
     if not (sc_filtered["var_unit"].values[0] == sc_filtered["var_unit"].values).all():
         raise ValueError(
             f"Unit mismatch in scalar data of heat demands. "
-            f"Please make sure units match in {in_path2}."
+            f"Please make sure units match in the scalar input data."
         )
 
     demand_unit = list(set(sc_filtered["var_unit"]))
@@ -307,6 +294,22 @@ def calculate_heat_load(sector, carrier, heat_load, yearly_demands):
 
 
 def prepare_heat_load_data(load, year):
+    """
+    Reads a regional heat load CSV file and returns a DataFrame indexed by datetime.
+
+    Parameters
+    ----------
+    load : str
+        Path to the CSV file with heat load data.
+    year : int
+        Year to assign to the datetime index.
+
+    Returns
+    -------
+    load : pd.DataFrame
+        DataFrame with columns 'heat_demand', 'cold_demand', 'electricity_demand' in MW,
+        indexed by hourly datetime.
+    """
     load = pd.read_csv(load, delimiter=",")
     load = load.rename(columns={"Wärme gesamt (kW)": "heat_demand"})
     load = load.rename(columns={"Zeit (TT-MM hh:mm)": "datetime"})

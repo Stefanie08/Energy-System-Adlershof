@@ -52,7 +52,10 @@ def reduce_labels(ax, simple_labels_dict):
 
     Returns
     -------
-
+    handles : list
+        Legend handles with simplified labels applied.
+    labels : list of str
+        Legend labels with replacements applied; duplicate entries are marked '_Hidden'.
     """
     handles, labels = ax.get_legend_handles_labels()
 
@@ -66,11 +69,25 @@ def reduce_labels(ax, simple_labels_dict):
 
 
 def get_component_from_tuple(tuple):
-    # Dummy implementation because for this application, component is always first in tuple.
+    """Returns the component name (first element) from a multi-index column tuple."""
     return tuple[0]
 
 
 def get_region_carrier_tech_from_component_name(component_name):
+    """
+    Splits a component name of the form 'region-carrier-tech' into its three parts.
+
+    Parameters
+    ----------
+    component_name : str
+        Component name with '-' as delimiter (e.g. 'adlershof-electricity-storage').
+
+    Returns
+    -------
+    region : str
+    carrier : str
+    tech : str
+    """
     DELIMITER = "-"
 
     region, carrier, tech = component_name.split(DELIMITER)
@@ -79,6 +96,21 @@ def get_region_carrier_tech_from_component_name(component_name):
 
 
 def results_ts_to_oemof_b3(df):
+    """
+    Converts a postprocessed storage content DataFrame (multi-index columns) to oemof-B3
+    timeseries format and extracts region, carrier and tech from the component name.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with multi-level column index as produced by oemoflex postprocessing.
+
+    Returns
+    -------
+    _df : pd.DataFrame
+        Stacked timeseries in oemof-B3 format with columns 'region' and 'var_name'
+        (carrier-tech).
+    """
     _df = df.copy()
 
     _df.columns = df.columns.droplevel(2).map(get_component_from_tuple)
@@ -95,12 +127,45 @@ def results_ts_to_oemof_b3(df):
 
 
 def normalize_to_max(ts):
+    """
+    Normalizes a timeseries (or DataFrame) to its maximum value.
+
+    Parameters
+    ----------
+    ts : pd.Series or pd.DataFrame
+
+    Returns
+    -------
+    ts_norm : pd.Series or pd.DataFrame
+        Values scaled to [0, 1].
+    """
     max = ts.max()
     ts_norm = ts / max
     return ts_norm
 
 
 def multiplot_df(df, figsize=None, sharex=True, colors=None, **kwargs):
+    """
+    Creates a vertically stacked subplot for each column in df.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame where each column is plotted in its own subplot.
+    figsize : tuple, optional
+        Figure size passed to matplotlib.
+    sharex : bool
+        Whether subplots share the x-axis. Default True.
+    colors : dict, optional
+        Mapping from column name to color. All column names must be present as keys.
+    **kwargs
+        Additional keyword arguments passed to ax.plot().
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    axs : np.ndarray of matplotlib.axes.Axes
+    """
     n_cols = len(df.columns)
 
     fig, axs = plt.subplots(n_cols, 1, figsize=figsize, sharex=sharex, squeeze=False)

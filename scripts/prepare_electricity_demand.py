@@ -14,13 +14,12 @@ pandas.DataFrame
     with normalized load data of 50Hertz region in Germany from the years 2015, 2016, 2017, 2018
     and 2019. The data is normalized with the total electricity demand of the corresponding year.
 
-Description Todo:Change description
+Description
 -------------
-The corresponding snakemake rule of the preparation of the electricity demand profile
-downloads the 60 min timeseries data from OPSD and keeps it locally.
-The script takes this data and filters for the load data of the 50Hertz region in Germany.
-The load data is normalized with the total electricity demand of the corresponding year and put
-into the timeseries template format. The years 2015 to 2019 (including) are available.
+Prepares hourly electricity demand profiles for each region and scenario.
+Regional load time series (1h resolution) are scaled to match the total yearly
+electricity demand from the scalar data. Profiles are written to the oemof-B3
+timeseries format. One output row is created per region-scenario combination.
 Note: the electricity demand profile for electric vehicle charging is prepared in
 `prepare_vehicle_charging_demand.py`.
 
@@ -95,8 +94,8 @@ def get_electricity_demand(scalars, scenario, carrier, region):
     -------
     demands : DataFrame
         Dataframe with total yearly demand of electricity demand for a region.
-    demand_unit : str
-        Unit of total demands (eg. GWh)
+    demand_unit : list of str
+        Unit(s) of total demands (eg. ['GWh'])
 
     """
     demands = pd.DataFrame()
@@ -133,17 +132,14 @@ def calc_electricity_load(electricity_load, yearly_demands, sector, carrier):
 
     Parameters
     ----------
-    load_data : pd.DataFrame
-        DataFrame with load profile data
-
-    shares : dict[str, float]
-        Mapping from building type ('sfh', 'mfh', 'lab', 'uni', 'office', 'ghd')
-        to its relative share in the total building distribution.
-    yearly_demands : dict[str, float]
-        Mapping from sector name to total yearly demand of the sector in the region and scenario.
+    electricity_load : pd.DataFrame
+        DataFrame with normalized load profile (column 'electricity_demand').
+    yearly_demands : pd.DataFrame
+        DataFrame with total yearly demand per carrier for the region and scenario.
     sector : str
-        Sector name (eg. 'sfh', 'mfh', 'lab', 'uni
-        'office', 'ghd')
+        Sector name (e.g. 'sfh', 'mfh', 'lab', 'uni', 'office', 'ghd').
+    carrier : str
+        Carrier name (e.g. 'electricity').
 
     Returns
     -------

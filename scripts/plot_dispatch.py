@@ -98,7 +98,8 @@ def plot_dispatch_data(df, df_demand, bus_name):
 
     Returns
     -------
-
+    None
+        Saves static and interactive dispatch plots to the `plotted` directory.
     """
     # change colors for demand in colors_odict to black
     for i in df_demand.columns:
@@ -291,7 +292,10 @@ def reduce_labels(ax, simple_labels_dict):
 
     Returns
     -------
-
+    handles : list
+        Legend handles with simplified labels applied.
+    labels : list of str
+        Legend labels with replacements applied; duplicate entries are marked '_Hidden'.
     """
     handles, labels = ax.get_legend_handles_labels()
 
@@ -310,8 +314,8 @@ def aggregate_by_region(bus_files, carrier):
 
     Parameters
     ----------
-    bus_files: pd.DataFrame
-        Dataframe with bus data from ``results/{scenario}/postprocessed/sequences/bus``
+    bus_files: list of str
+        List of bus file names from ``results/{scenario}/postprocessed/sequences/bus``.
 
     Returns
     -------

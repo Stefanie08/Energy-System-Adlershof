@@ -115,21 +115,24 @@ def prepare_pv_time_series(filename_ts, year, type):
 
 def prepare_solarthermal_time_series(filename_ts, year, type):
     r"""
-    Prepares and formats time series of `type` `solarthermal' for region 'AD'.
+    Prepares and formats a solarthermal feed-in time series for region 'AD'.
+
+    Applies the same azimuth-weighted aggregation as `prepare_pv_time_series` to the
+    solarthermal raw data and converts it to oemof-B3 timeseries format.
 
     Parameters
     ----------
     filename_ts : str
-        Path including file name to pv time series of oemof.thermal
+        Path including file name to the solarthermal feed-in time series CSV (oemof.thermal output).
     year : int
-        Year for which time series is extracted from raw data in `filename_ts`
+        Year for which time series is extracted from raw data in `filename_ts`.
     type : str
-        Type of time series like 'solar-pv_roof'; used for column 'var_name' in output
+        Type identifier used for column 'var_name' in output (e.g. 'solar-solarthermal').
 
     Returns
     -------
     ts_prepared : pd.DataFrame
-        Contains time series in the format of time series template of oemof-B3
+        Contains time series in the format of time series template of oemof-B3.
 
     """
     # load roof data
@@ -189,16 +192,19 @@ def prepare_solarthermal_time_series(filename_ts, year, type):
 
 def prepare_pv_facade_time_series(filename_ts, year, type):
     r"""
-    Formats time series of `type` `pv_facade' for region 'AD'.
+    Prepares and formats a PV facade feed-in time series for region 'AD'.
+
+    Reads the raw GSEE output, extracts the 'pv_facade' column for the given year,
+    and converts it to oemof-B3 timeseries format.
 
     Parameters
     ----------
     filename_ts : str
-        Path including file name to pv time series of GSEE
+        Path including file name to the PV facade feed-in time series CSV (GSEE output).
     year : int
-        Year for which time series is extracted from raw data in `filename_ts`
+        Year for which time series is extracted from raw data in `filename_ts`.
     type : str
-        Type of time series like 'solar-pv_roof'; used for column 'var_name' in output
+        Type identifier used for column 'var_name' in output (e.g. 'solar-pv_facade').
 
     Returns
     -------
